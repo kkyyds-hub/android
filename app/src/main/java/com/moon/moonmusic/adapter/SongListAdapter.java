@@ -13,6 +13,10 @@ import com.moon.moonmusic.model.Song;
 
 import java.util.List;
 
+/**
+ * 歌曲列表适配器：把 Song 数据对象转换成 ListView 里能看到的一行歌曲卡片。
+ * 期末演示时可以说明 Adapter 是“数据”和“界面控件”之间的桥梁。
+ */
 public class SongListAdapter extends BaseAdapter {
 
     private final Context context;
@@ -48,6 +52,7 @@ public class SongListAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder vh;
         if (convertView == null) {
+            // convertView 为空时才加载 XML；滑动列表时复用旧 View，避免频繁创建控件导致卡顿。
             convertView = LayoutInflater.from(context).inflate(R.layout.item_song, parent, false);
             vh = new ViewHolder();
             vh.ivCover = convertView.findViewById(R.id.iv_cover);
@@ -55,6 +60,7 @@ public class SongListAdapter extends BaseAdapter {
             vh.tvSubtitle = convertView.findViewById(R.id.tv_subtitle);
             convertView.setTag(vh);
         } else {
+            // ViewHolder 保存子控件引用，复用时不用重复 findViewById，这是 ListView 常见优化写法。
             vh = (ViewHolder) convertView.getTag();
         }
 

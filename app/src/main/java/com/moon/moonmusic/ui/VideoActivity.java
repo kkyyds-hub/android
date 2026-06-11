@@ -14,6 +14,7 @@ import com.moon.moonmusic.view.MusicWaveCanvasView;
 
 /**
  * 视频播放页：播放谢霆锋 2000 Viva Live 演唱会片段。
+ * 这里把 VideoView 视频播放和自定义 Canvas 音浪结合起来，便于演示媒体播放与自定义绘图联动。
  */
 public class VideoActivity extends AppCompatActivity {
 
@@ -38,6 +39,7 @@ public class VideoActivity extends AppCompatActivity {
     private final Runnable waveSyncRunnable = new Runnable() {
         @Override
         public void run() {
+            // 定时检查 VideoView 是否正在播放，再决定自定义音浪是否继续刷新。
             syncWaveWithVideoState();
             if (videoView != null) {
                 videoView.postDelayed(this, WAVE_SYNC_INTERVAL_MS);
@@ -65,11 +67,13 @@ public class VideoActivity extends AppCompatActivity {
 
     private void initData() {
         tvTitle.setText(VIDEO_TITLE);
+        // MediaController 是 Android 自带的视频控制条，提供播放、暂停、拖动进度等基础能力。
         MediaController controller = new MediaController(this);
         controller.setAnchorView(videoView);
         videoView.setMediaController(controller);
 
         videoView.setOnPreparedListener(mp -> {
+            // 视频资源准备好后再 start，避免文件还没解析完成就播放导致黑屏或无响应。
             mp.setLooping(true);
             tvVideoStatus.setText(STATUS_PLAYING);
             videoView.start();
@@ -86,6 +90,7 @@ public class VideoActivity extends AppCompatActivity {
 
     private void playVivaLiveClip() {
         tvVideoStatus.setText(STATUS_LOADING);
+        // 视频放在 res/raw 中，通过 android.resource:// 形式交给 VideoView 播放。
         videoView.setVideoURI(buildLocalVideoUri(getPackageName()));
     }
 
@@ -116,12 +121,14 @@ public class VideoActivity extends AppCompatActivity {
     private void setWaveAnimating(boolean animating) {
         if (musicWaveView == null || waveAnimating == animating) return;
         waveAnimating = animating;
+        // VideoView 播放时开启 Canvas 动画，暂停或离开页面时停止，节省刷新开销。
         musicWaveView.setAnimationEnabled(animating);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        // 离开视频页时暂停视频和音浪，避免看不到页面时还在播放。
         stopWaveSync();
         setWaveAnimating(false);
         if (videoView != null && videoView.isPlaying()) {

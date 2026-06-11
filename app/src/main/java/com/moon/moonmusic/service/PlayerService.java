@@ -54,6 +54,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
     @Override
     public void onCreate() {
         super.onCreate();
+        // Service 创建时先准备播放列表和 MediaPlayer，后续多个 Activity 入口都能复用同一套播放逻辑。
         playlist = SongRepository.getPlayableSongList();
         ensurePlayer();
         createNotificationChannelIfNeeded();
@@ -73,6 +74,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
 
     private void handleAction(Intent intent) {
         String action = intent.getAction();
+        // 通知栏按钮、播放器按钮、页面跳转都转成这些 action，Service 只需要集中处理播放命令。
         if (AppConstants.ACTION_SET_SONG.equals(action)) {
             int songId = intent.getIntExtra(AppConstants.EXTRA_SONG_ID, 1);
             boolean fromDownload = intent.getBooleanExtra(AppConstants.EXTRA_FROM_DOWNLOAD, false);
@@ -95,6 +97,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
 
     private void ensurePlayer() {
         if (mediaPlayer == null) {
+            // MediaPlayer 是音频播放核心对象，放在 Service 中可以让离开播放器页面后音乐继续播放。
             mediaPlayer = new MediaPlayer();
             mediaPlayer.setOnCompletionListener(this);
         }
@@ -128,6 +131,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
 
     public void seekTo(int ms) {
         try {
+            // SeekBar 拖动后的毫秒位置最终会走到这里，交给 MediaPlayer 跳转播放进度。
             if (mediaPlayer != null) mediaPlayer.seekTo(ms);
         } catch (IllegalStateException ignored) {
         }
@@ -136,6 +140,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
     public void togglePlayPause() {
         if (mediaPlayer == null) return;
         try {
+            // 同一个按钮控制播放/暂停：根据 MediaPlayer 当前状态决定下一步操作。
             if (mediaPlayer.isPlaying()) {
                 mediaPlayer.pause();
             } else {
@@ -166,12 +171,14 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
 
     public void next() {
         if (playlist == null || playlist.isEmpty()) return;
+        // 取模让最后一首的下一首回到第一首，形成简单循环播放列表。
         currentIndex = (currentIndex + 1) % playlist.size();
         setSongInternal(getCurrentSong(), currentFromDownload, true);
     }
 
     public void prev() {
         if (playlist == null || playlist.isEmpty()) return;
+        // 加上 playlist.size() 再取模，避免第一首点上一首时出现负数下标。
         currentIndex = (currentIndex - 1 + playlist.size()) % playlist.size();
         setSongInternal(getCurrentSong(), currentFromDownload, true);
     }
@@ -192,6 +199,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         ensurePlayer();
         currentFromDownload = fromDownload;
         try {
+            // 切歌前必须 reset，否则旧数据源还在 MediaPlayer 里，新音频无法正常 prepare。
             mediaPlayer.reset();
 
             boolean dataSourceSet = false;
@@ -200,19 +208,21 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
                 if (dir != null) {
                     File f = new File(dir, "song" + song.getId() + ".mp3");
                     if (f.exists()) {
+                        // 下载页进入播放器时优先播放已保存的 mp3，体现本地文件播放流程。
                         mediaPlayer.setDataSource(f.getAbsolutePath());
                         dataSourceSet = true;
                     }
                 }
             }
 
-            // 如果没有下载文件，就回退到 assets
+            // 如果没有下载文件，就回退到 assets，保证未下载的歌曲也能正常播放。
             if (!dataSourceSet) {
                 AssetFileDescriptor afd = getAssets().openFd(song.getAssetMusicPath());
                 mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
                 afd.close();
             }
 
+            // prepare 会读取音频元信息；本项目音频在本地，所以同步 prepare 足够直观。
             mediaPlayer.prepare();
             if (autoPlay) {
                 mediaPlayer.start();
@@ -234,7 +244,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        // 自动下一首（循环）
+        // 一首歌播放结束后自动下一首，和 next() 复用同一段切歌逻辑。
         next();
     }
 
@@ -243,6 +253,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         super.onDestroy();
         if (mediaPlayer != null) {
             try {
+                // Service 销毁时释放播放器资源，避免音频解码器和文件句柄一直占用。
                 mediaPlayer.release();
             } catch (Exception ignored) {
             }
@@ -252,6 +263,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
 
     private void createNotificationChannelIfNeeded() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Android 8 以后通知必须属于某个 Channel，前台播放通知也不例外。
             NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             NotificationChannel channel = new NotificationChannel(
                     AppConstants.NOTI_CHANNEL_ID,
@@ -273,6 +285,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         String title = song == null ? "MOON MUSIC" : song.getTitle();
         String text = song == null ? "正在播放" : (song.getArtist() + " · " + song.getAlbum());
 
+        // 通知栏四个按钮通过 PendingIntent 发广播，再由 BroadcastReceiver 转成 Service action。
         PendingIntent piPrev = PlaybackActionReceiver.pendingIntent(this, AppConstants.ACTION_PREV);
         PendingIntent piPlayPause = PlaybackActionReceiver.pendingIntent(this, AppConstants.ACTION_PLAY_PAUSE);
         PendingIntent piNext = PlaybackActionReceiver.pendingIntent(this, AppConstants.ACTION_NEXT);
@@ -286,12 +299,12 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
                 .setOnlyAlertOnce(true)
                 .addAction(R.drawable.ic_nav_home, "上一首", piPrev)
                 .addAction(R.drawable.ic_heart, isPlaying() ? "暂停" : "播放", piPlayPause)
-                // 项目已移除“发现”页图标，通知栏这里复用已有图标即可
+                // 项目已移除“发现”页图标，通知栏这里复用已有图标即可。
                 .addAction(R.drawable.ic_nav_home, "下一首", piNext)
                 .addAction(R.drawable.ic_nav_my, "停止", piStop)
                 .setPriority(NotificationCompat.PRIORITY_LOW);
 
-        // 点击通知回到播放器
+        // 点击通知回到播放器，方便演示从后台通知返回播放页面。
         Intent it = new Intent(this, com.moon.moonmusic.ui.PlayerActivity.class);
         it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent contentPi = PendingIntent.getActivity(

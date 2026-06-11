@@ -26,6 +26,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 下载页：只展示已经复制到本地目录的歌曲。
+ * 重点演示 BroadcastReceiver 接收下载完成通知、刷新 ListView、再跳转到播放器播放本地文件。
+ */
 public class DownloadFragment extends Fragment {
 
     private ListView lvDownloads;
@@ -37,6 +41,7 @@ public class DownloadFragment extends Fragment {
         public void onReceive(android.content.Context context, Intent intent) {
             if (intent == null || intent.getAction() == null) return;
             if (AppConstants.ACTION_DOWNLOAD_DONE.equals(intent.getAction())) {
+                // DownloadService 发出完成广播后，下载页马上重新扫描本地目录并刷新列表。
                 refresh();
                 Toast.makeText(requireContext(), "下载完成，已刷新列表", Toast.LENGTH_SHORT).show();
             }
@@ -60,6 +65,7 @@ public class DownloadFragment extends Fragment {
             Song s = data.get(position);
             Intent it = new Intent(requireContext(), PlayerActivity.class);
             it.putExtra(PlayerActivity.EXTRA_SONG_ID, s.getId());
+            // 标记从下载页播放，PlayerService 会优先读取本地 mp3 文件。
             it.putExtra(PlayerActivity.EXTRA_PLAY_FROM_DOWNLOAD, true);
             startActivity(it);
         });
@@ -69,6 +75,7 @@ public class DownloadFragment extends Fragment {
     public void onResume() {
         super.onResume();
         refresh();
+        // 页面可见时注册广播；只接收本 App 内部的下载完成事件。
         ContextCompat.registerReceiver(
                 requireContext(),
                 downloadReceiver,
@@ -97,6 +104,7 @@ public class DownloadFragment extends Fragment {
         for (Song s : all) {
             File f = new File(dir, "song" + s.getId() + ".mp3");
             if (f.exists()) {
+                // 只有本地文件真实存在才加入列表，避免“显示了但点开不能播放”。
                 data.add(s);
             }
         }

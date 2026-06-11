@@ -17,6 +17,10 @@ import com.moon.moonmusic.db.UserDao;
 import com.moon.moonmusic.model.User;
 import com.moon.moonmusic.util.SpUtil;
 
+/**
+ * 登录/注册页面：负责收集用户信息，写入 SQLite，并把登录态保存到 SharedPreferences。
+ * 这是进入主功能前的入口页面，也体现了 Activity 跳转到 MainActivity 的流程。
+ */
 public class LoginActivity extends AppCompatActivity {
 
     private EditText etNickname, etQq, etPwd;
@@ -61,7 +65,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void initData() {
         userDao = new UserDao(this);
-        // 如果已登录，直接进入主页
+        // 如果已登录，直接进入主页，避免用户每次打开 App 都重新登录。
         String qq = SpUtil.getLoginQq(this);
         if (!TextUtils.isEmpty(qq)) {
             startActivity(new Intent(this, MainActivity.class));
@@ -93,9 +97,10 @@ public class LoginActivity extends AppCompatActivity {
         String hobbies = buildHobbies();
 
         User u = new User(nickname, qq, pwd, gender, hobbies);
+        // 注册信息写入 SQLite，成功后再保存登录态并进入主页面。
         long id = userDao.insertUser(u);
         if (id > 0) {
-            // 新账号注册 -> 固定 Zack 头像
+            // 新账号注册后固定使用 Zack 头像，方便演示“注册用户”和“已有用户”的差异。
             SpUtil.saveLogin(this, qq, nickname, SpUtil.AVATAR_ZACK);
             toast("注册成功，已登录");
             startActivity(new Intent(this, MainActivity.class));
@@ -116,7 +121,7 @@ public class LoginActivity extends AppCompatActivity {
 
         User u = userDao.login(qq, pwd);
         if (u != null) {
-            // 已有账号登录 -> 固定 Aerith 头像
+            // 登录成功后把关键信息放进 SharedPreferences，我的页面会读取这些信息展示用户栏。
             SpUtil.saveLogin(this, u.getQq(), u.getNickname(), SpUtil.AVATAR_AERITH);
             toast("登录成功");
             startActivity(new Intent(this, MainActivity.class));
@@ -128,6 +133,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private String buildHobbies() {
         StringBuilder sb = new StringBuilder();
+        // 把多个复选框选择拼成一个字符串存库，适合演示表单数据收集。
         if (cbPop.isChecked()) sb.append("流行,");
         if (cbRock.isChecked()) sb.append("摇滚,");
         if (cbFolk.isChecked()) sb.append("民谣,");

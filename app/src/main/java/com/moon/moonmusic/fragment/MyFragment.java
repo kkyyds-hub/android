@@ -69,7 +69,7 @@ public class MyFragment extends Fragment {
 
     private void initData() {
         refreshUserBar(false);
-        // 默认显示“喜欢”
+        // “我的”页内部再嵌套两个子 Fragment，默认先显示“喜欢”列表。
         getChildFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fl_my_container, new FavoriteFragment())
@@ -77,6 +77,7 @@ public class MyFragment extends Fragment {
     }
 
     private void initListener() {
+        // 两个按钮切换子页面，用同一个容器承载 FavoriteFragment 和 DownloadFragment。
         btnFavorite.setOnClickListener(v -> getChildFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fl_my_container, new FavoriteFragment())
@@ -110,6 +111,7 @@ public class MyFragment extends Fragment {
     private void refreshUserBar(boolean closeDetail) {
         if (getContext() == null) return;
 
+        // 登录信息从 SharedPreferences 读取，不需要每次都查数据库，适合保存轻量级登录态。
         String qq = SpUtil.getLoginQq(requireContext());
         String nick = SpUtil.getLoginNick(requireContext());
         String avatarType = SpUtil.getAvatarType(requireContext());
@@ -148,6 +150,7 @@ public class MyFragment extends Fragment {
 
         detailShown = !detailShown;
         if (detailShown) {
+            // 展开用户详情时加一点位移动画，让用户知道这是同一个区域展开出来的。
             ivUserArrow.setImageResource(R.drawable.ic_chevron_up);
             llUserDetail.setVisibility(View.VISIBLE);
             llUserDetail.setAlpha(0f);
@@ -179,9 +182,9 @@ public class MyFragment extends Fragment {
 
     private void doLogout() {
         if (getContext() == null) return;
-        // 清理登录态
+        // 清理登录态。
         SpUtil.clearLogin(requireContext());
-        // 退出时停止播放，避免“退出登录后还在播放”造成验收质疑
+        // 退出时停止播放，避免“退出登录后还在播放”造成验收质疑。
         try {
             requireContext().stopService(new Intent(requireContext(), PlayerService.class));
         } catch (Exception ignored) {
@@ -189,7 +192,7 @@ public class MyFragment extends Fragment {
 
         Toast.makeText(requireContext(), "已退出登录", Toast.LENGTH_SHORT).show();
 
-        // 回到登录页，并清空回退栈
+        // 回到登录页，并清空回退栈，用户按返回键不会回到已退出的主页。
         Intent it = new Intent(requireContext(), LoginActivity.class);
         it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(it);

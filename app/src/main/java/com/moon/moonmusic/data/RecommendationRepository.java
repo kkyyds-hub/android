@@ -66,12 +66,14 @@ public class RecommendationRepository {
     }
 
     public static void loadTodayRecommendation(Callback callback) {
+        // 网络请求不能放在主线程，否则 Android 会抛异常并卡住界面；这里开子线程请求 iTunes。
         new Thread(() -> {
             RemoteRecommendation recommendation;
             try {
                 String json = requestJson(RECOMMEND_URL);
                 recommendation = parseRecommendation(json, nextRecommendationIndex());
             } catch (Exception e) {
+                // 演示现场网络不稳定时仍能展示功能，所以失败后回退到本地推荐数据。
                 recommendation = getFallbackRecommendation();
             }
             if (callback != null) {
@@ -91,6 +93,7 @@ public class RecommendationRepository {
             return getFallbackRecommendation();
         }
 
+        // preferredIndex 会递增，点击“换一首”时就能从返回列表中轮流取不同歌曲。
         JSONObject selected = results.getJSONObject(normalizeIndex(preferredIndex, results.length()));
         String trackName = optClean(selected, "trackName");
         String collectionName = optClean(selected, "collectionName");
@@ -146,12 +149,14 @@ public class RecommendationRepository {
         try {
             URL url = new URL(urlText);
             connection = (HttpURLConnection) url.openConnection();
+            // HTTP 知识点：设置请求方法、超时时间和 Accept 头，避免网络异常时一直等待。
             connection.setRequestMethod("GET");
             connection.setConnectTimeout(5000);
             connection.setReadTimeout(5000);
             connection.setRequestProperty("Accept", "application/json");
 
             int code = connection.getResponseCode();
+            // 2xx 读正常响应，其它状态读错误流，方便调试时看到服务器返回了什么。
             InputStream is = code >= 200 && code < 300
                     ? connection.getInputStream()
                     : connection.getErrorStream();
@@ -172,6 +177,7 @@ public class RecommendationRepository {
         StringBuilder sb = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(
                 new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+            // JSON 是文本数据，按 UTF-8 一行一行读出后再交给 JSONObject 解析。
             String line;
             while ((line = reader.readLine()) != null) {
                 sb.append(line).append('\n');
@@ -189,6 +195,7 @@ public class RecommendationRepository {
 
     private static String upgradeArtworkUrl(String artworkUrl) {
         if (artworkUrl.isEmpty()) return "";
+        // iTunes 默认图较小，把 100x100 替换成 300x300，封面显示时会更清晰。
         return artworkUrl.replace("100x100bb.jpg", "300x300bb.jpg");
     }
 

@@ -16,7 +16,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- User card (QQ Music style: avatar + nick + arrow, click to expand details) -->
+    <!-- 用户信息卡片：点击头像昵称区域可以展开账号和退出登录按钮。 -->
     <LinearLayout
         android:id="@+id/ll_user_panel"
         android:layout_width="wrap_content"
@@ -96,7 +96,7 @@
 
     </LinearLayout>
 
-    <!-- Avoid covering the big background logo area -->
+    <!-- 内容起始线：让列表区域避开背景图里的主要图案。 -->
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/gl_content_top"
         android:layout_width="wrap_content"
@@ -138,6 +138,7 @@
 
     </LinearLayout>
 
+    <!-- 子页面容器：我的喜欢和我的下载两个 Fragment 会在这里切换。 -->
     <FrameLayout
         android:id="@+id/fl_my_container"
         android:layout_width="0dp"

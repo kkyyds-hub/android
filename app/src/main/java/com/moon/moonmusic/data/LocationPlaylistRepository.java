@@ -4,6 +4,10 @@ import com.moon.moonmusic.model.LocationPlaylistRecommendation;
 
 import java.util.Locale;
 
+/**
+ * 定位歌单数据源：根据经纬度粗略判断城市区域，再返回一首适合演示的推荐歌。
+ * 这里不联网查地图，目的是把定位权限、经纬度判断和播放器跳转流程讲清楚。
+ */
 public class LocationPlaylistRepository {
 
     private static final int SONG_BECAUSE_LOVE = 201;
@@ -15,6 +19,7 @@ public class LocationPlaylistRepository {
     }
 
     public static LocationPlaylistRecommendation buildFromLocation(double latitude, double longitude) {
+        // 这里只做范围判断，不追求真实地图精度；课堂演示重点是“拿到位置后生成推荐”。
         if (isGreaterBayArea(latitude, longitude)) {
             return new LocationPlaylistRecommendation(
                     "感知定位 · 粤港澳",
@@ -78,14 +83,17 @@ public class LocationPlaylistRepository {
     }
 
     static boolean isGreaterBayArea(double latitude, double longitude) {
+        // 粗略覆盖粤港澳一带，经纬度落入范围就推荐粤语摇滚现场风格。
         return latitude >= 21.5 && latitude <= 24.2 && longitude >= 112.0 && longitude <= 115.6;
     }
 
     static boolean isBeijingArea(double latitude, double longitude) {
+        // 粗略覆盖北京周边，用来演示不同位置得到不同推荐结果。
         return latitude >= 39.2 && latitude <= 41.1 && longitude >= 115.4 && longitude <= 117.6;
     }
 
     static boolean isYangtzeRiverDelta(double latitude, double longitude) {
+        // 粗略覆盖江浙沪城市群，保持逻辑简单，便于答辩时解释。
         return latitude >= 29.5 && latitude <= 32.8 && longitude >= 119.0 && longitude <= 122.8;
     }
 

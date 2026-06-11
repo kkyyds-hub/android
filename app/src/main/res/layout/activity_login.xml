@@ -23,6 +23,7 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.35" />
 
+    <!-- 登录注册表单：LoginActivity 会读取这些输入，完成 SQLite 注册和 SharedPreferences 登录态保存。 -->
     <LinearLayout
         android:id="@+id/ll_card"
         android:layout_width="0dp"

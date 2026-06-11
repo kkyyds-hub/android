@@ -16,7 +16,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Dim overlay to ensure readability over a complex background -->
+    <!-- 半透明遮罩：让复杂背景上的文字和列表更容易看清。 -->
     <View
         android:id="@+id/v_home_dim"
         android:layout_width="0dp"
@@ -27,7 +27,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- Header card (QQ music style: title + hint, no fake search entrance per your choice) -->
+    <!-- 首页头部：说明当前列表是可播放、可下载的推荐歌曲入口。 -->
     <LinearLayout
         android:id="@+id/ll_home_header"
         android:layout_width="0dp"
@@ -62,7 +62,7 @@
 
     </LinearLayout>
 
-    <!-- List container card -->
+    <!-- 歌曲列表容器：HomeFragment 会给 ListView 设置 SongListAdapter。 -->
     <FrameLayout
         android:id="@+id/fl_home_list_container"
         android:layout_width="0dp"

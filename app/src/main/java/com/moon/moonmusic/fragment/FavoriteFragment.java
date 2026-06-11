@@ -19,6 +19,10 @@ import com.moon.moonmusic.model.Song;
 
 import java.util.List;
 
+/**
+ * 喜欢页：演示 ListView 展示收藏歌曲，以及长按删除后通知其它页面刷新。
+ * 当前收藏列表主要用于页面展示，所以点击时只提示未提供音频资源。
+ */
 public class FavoriteFragment extends Fragment {
 
     private ListView lvFavorites;
@@ -42,10 +46,11 @@ public class FavoriteFragment extends Fragment {
 
         lvFavorites.setOnItemClickListener((parent, v, position, id) -> {
             Song s = data.get(position);
+            // 收藏页的部分歌曲没有放入音频文件，点击时用 Toast 说明，避免误跳播放器报错。
             Toast.makeText(requireContext(), "演示歌曲：" + s.getTitle() + "（未提供音频资源）", Toast.LENGTH_SHORT).show();
         });
 
-        // 长按删除（仅内存删除）：用于演示 ListView + Adapter + 广播通知
+        // 长按删除（仅内存删除）：用于演示 ListView + Adapter + 广播通知。
         lvFavorites.setOnItemLongClickListener((parent, v, position, id) -> {
             Song s = data.remove(position);
             adapter.notifyDataSetChanged();
