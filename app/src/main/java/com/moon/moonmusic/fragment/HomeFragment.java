@@ -47,6 +47,10 @@ public class HomeFragment extends Fragment {
         lvSongs = v.findViewById(R.id.lv_download_songs);
     }
 
+    /**
+     * 加载首页歌曲列表并绑定适配器。
+     * 列表数据来自 SongRepository，ListView 只负责展示和响应点击。
+     */
     private void initData() {
         // 首页复用 SongRepository 中的歌曲数据，Adapter 负责把每首歌渲染成 item_song 布局。
         data = SongRepository.getDownloadSongList();
@@ -54,6 +58,10 @@ public class HomeFragment extends Fragment {
         lvSongs.setAdapter(adapter);
     }
 
+    /**
+     * 处理首页歌曲点击。
+     * 点击后把歌曲 id 放进 Intent，播放器页面再根据 id 加载音频、封面和歌词。
+     */
     private void initListener() {
         lvSongs.setOnItemClickListener((parent, view, position, id) -> {
             Song s = data.get(position);

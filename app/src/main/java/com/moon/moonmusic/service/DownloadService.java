@@ -34,6 +34,10 @@ public class DownloadService extends Service {
         return null;
     }
 
+    /**
+     * 接收播放器页面发来的下载命令。
+     * 校验 action 后把复制文件的任务交给单线程执行器，完成后通过广播通知下载页刷新。
+     */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null) {
@@ -74,6 +78,10 @@ public class DownloadService extends Service {
         return START_NOT_STICKY;
     }
 
+    /**
+     * 根据歌曲编号找到对应歌曲，并把音频和歌词复制到应用专属下载目录。
+     * PlayerService 和下载页都按固定文件名查找这些本地文件。
+     */
     private boolean downloadSong(int songId) {
         List<Song> list = SongRepository.getPlayableSongList();
         Song target = null;
@@ -101,6 +109,10 @@ public class DownloadService extends Service {
         }
     }
 
+    /**
+     * 把 assets 中的资源复制成普通文件。
+     * 音频和歌词都走这个方法，因此使用字节流处理，避免文本和二进制资源分开写两套逻辑。
+     */
     private void copyAssetToFile(String assetPath, File outFile) throws IOException {
         if (assetPath == null || assetPath.isEmpty()) return;
         try (InputStream in = getAssets().open(assetPath);

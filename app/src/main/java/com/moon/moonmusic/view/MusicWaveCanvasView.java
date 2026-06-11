@@ -48,6 +48,10 @@ public class MusicWaveCanvasView extends View {
         init();
     }
 
+    /**
+     * 初始化绘图用的 Paint。
+     * 构造方法都会调用这里，提前配置颜色、线宽和文字样式，避免绘制时重复设置。
+     */
     private void init() {
         // Paint 提前初始化，onDraw 时直接复用，避免绘制过程中频繁创建对象。
         discPaint.setColor(Color.rgb(24, 24, 30));
@@ -68,6 +72,10 @@ public class MusicWaveCanvasView extends View {
         textPaint.setTextSize(dp(18));
     }
 
+    /**
+     * 完成自定义 View 的整体绘制。
+     * 系统刷新 View 或动画调用 invalidate 后，会重新进入这里绘制唱片、音浪和文字。
+     */
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -84,6 +92,10 @@ public class MusicWaveCanvasView extends View {
         drawLabel(canvas, width, height);
     }
 
+    /**
+     * 绘制左侧唱片图形。
+     * 唱片中心和高光弧线会根据 animationFrame 轻微变化，形成动态效果。
+     */
     private void drawRecord(Canvas canvas, float centerX, float centerY, float radius) {
         // 唱片主体：先画黑色圆，再画三圈白色圆环，体现 Canvas 基础图形绘制。
         canvas.drawCircle(centerX, centerY, radius, discPaint);
@@ -109,6 +121,10 @@ public class MusicWaveCanvasView extends View {
         canvas.drawArc(arcRect, calculateArcStartAngle(animationFrame), 85, false, arcPaint);
     }
 
+    /**
+     * 绘制右侧音浪竖线。
+     * 竖线高度由当前帧计算出来，视频播放时会不断刷新形成节奏变化。
+     */
     private void drawWaves(Canvas canvas, float width, float height) {
         float startX = width * 0.58f;
         float baseY = height * 0.5f;
@@ -133,10 +149,18 @@ public class MusicWaveCanvasView extends View {
         canvas.drawText("Viva Live 节奏可视化", width * 0.71f, height * 0.78f, smallTextPaint);
     }
 
+    /**
+     * 计算静止状态下的音浪高度。
+     * 测试和关闭动画后的静态绘制会使用这一组默认高度。
+     */
     public static int[] calculateWaveHeights(int viewHeight) {
         return calculateAnimatedWaveHeights(viewHeight, 0);
     }
 
+    /**
+     * 根据 View 高度和动画帧计算音浪高度。
+     * 返回值会被 drawWaves 使用，决定每条竖线在当前帧的长度。
+     */
     public static int[] calculateAnimatedWaveHeights(int viewHeight, int frame) {
         int safeHeight = Math.max(viewHeight, 120);
         // 用简单数学公式生成节奏感，不依赖真实音频频谱，绘制逻辑更稳定。
@@ -161,6 +185,10 @@ public class MusicWaveCanvasView extends View {
         return 0.20f + beat * 0.06f;
     }
 
+    /**
+     * 控制音浪动画的启动和停止。
+     * VideoActivity 会根据视频播放状态调用它，开启时持续刷新，关闭时回到静止帧。
+     */
     public void setAnimationEnabled(boolean enabled) {
         animationEnabled = enabled;
         if (enabled) {

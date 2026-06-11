@@ -2,6 +2,7 @@ package com.moon.moonmusic.constant;
 
 /**
  * 集中管理跨组件使用的动作、传参键和通知常量。
+ * 其它页面和服务统一引用这里的常量，避免同一个字符串在多个地方重复写。
  */
 public class AppConstants {
 

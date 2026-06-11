@@ -19,6 +19,10 @@ public class UserDao {
         helper = new UserDbHelper(context.getApplicationContext());
     }
 
+    /**
+     * 查询指定 QQ 是否已经注册。
+     * 注册流程会先调用这里做查重，避免重复账号继续写入数据库。
+     */
     public boolean existsQq(String qq) {
         SQLiteDatabase db = helper.getReadableDatabase();
         // 注册前先按 QQ 查询，避免 UNIQUE 约束报错后用户不知道原因。
@@ -32,6 +36,10 @@ public class UserDao {
         return ok;
     }
 
+    /**
+     * 把注册表单中的用户信息写入 SQLite。
+     * LoginActivity 根据返回的行号判断注册是否成功。
+     */
     public long insertUser(User user) {
         SQLiteDatabase db = helper.getWritableDatabase();
         // ContentValues 可以理解为一行数据的键值对，键对应数据库字段名。
@@ -45,6 +53,10 @@ public class UserDao {
         return db.insert(UserDbHelper.TABLE_USER, null, cv);
     }
 
+    /**
+     * 根据 QQ 和密码查询用户。
+     * 登录成功时返回完整 User 对象，页面会把其中的账号和昵称保存为登录态。
+     */
     public User login(String qq, String password) {
         SQLiteDatabase db = helper.getReadableDatabase();
         // 登录时同时匹配 QQ 和密码；使用占位参数可以避免手动拼接字符串带来的问题。

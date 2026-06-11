@@ -67,6 +67,10 @@ public class MyFragment extends Fragment {
         btnLogout = v.findViewById(R.id.btn_logout);
     }
 
+    /**
+     * 初始化我的页面数据。
+     * 先刷新用户信息栏，再默认把喜欢列表放入子 Fragment 容器。
+     */
     private void initData() {
         refreshUserBar(false);
         // “我的”页内部再嵌套两个子 Fragment，默认先显示“喜欢”列表。
@@ -76,6 +80,10 @@ public class MyFragment extends Fragment {
                 .commit();
     }
 
+    /**
+     * 注册我的页面中的切换和账号操作。
+     * 两个列表按钮会替换子 Fragment，用户信息栏负责展开详情，退出按钮负责清理登录态。
+     */
     private void initListener() {
         // 两个按钮切换子页面，用同一个容器承载 FavoriteFragment 和 DownloadFragment。
         btnFavorite.setOnClickListener(v -> getChildFragmentManager()
@@ -108,6 +116,10 @@ public class MyFragment extends Fragment {
         refreshUserBar(true);
     }
 
+    /**
+     * 根据当前登录态刷新头像、昵称和账号信息。
+     * 页面恢复显示时会调用它，确保从登录页或其它页面返回后信息仍然最新。
+     */
     private void refreshUserBar(boolean closeDetail) {
         if (getContext() == null) return;
 
@@ -145,6 +157,10 @@ public class MyFragment extends Fragment {
         }
     }
 
+    /**
+     * 展开或收起用户详情区域。
+     * 只有已登录用户点击用户栏时才会调用，展开后可以看到账号和退出按钮。
+     */
     private void toggleUserDetail() {
         if (llUserDetail == null) return;
 
@@ -180,6 +196,10 @@ public class MyFragment extends Fragment {
         return dp * getResources().getDisplayMetrics().density;
     }
 
+    /**
+     * 退出当前账号并回到登录页。
+     * 方法会清理本地登录态、停止播放服务，并清空主页的返回栈。
+     */
     private void doLogout() {
         if (getContext() == null) return;
         // 清理登录态。

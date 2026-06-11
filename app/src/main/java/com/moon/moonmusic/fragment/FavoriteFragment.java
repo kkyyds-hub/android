@@ -35,6 +35,10 @@ public class FavoriteFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_favorite, container, false);
     }
 
+    /**
+     * 准备喜欢列表并注册点击、长按行为。
+     * 点击只提示当前条目，长按会从内存列表移除并通知其它页面。
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);

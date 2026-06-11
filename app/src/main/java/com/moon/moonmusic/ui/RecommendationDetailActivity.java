@@ -59,6 +59,10 @@ public class RecommendationDetailActivity extends AppCompatActivity {
         return text == null || text.trim().isEmpty();
     }
 
+    /**
+     * 配置并加载页面底部的 WebView。
+     * 详情页使用 assets 中的本地网页，因此这里主要处理脚本、存储和缩放相关设置。
+     */
     @SuppressLint("SetJavaScriptEnabled")
     private void initWebView() {
         WebSettings settings = webView.getSettings();
@@ -73,6 +77,10 @@ public class RecommendationDetailActivity extends AppCompatActivity {
         webView.loadUrl(H5_ASSET_URL);
     }
 
+    /**
+     * 页面销毁时释放 WebView。
+     * WebView 持有的内部资源比较多，手动销毁可以减少返回上一页后的内存占用。
+     */
     @Override
     protected void onDestroy() {
         if (webView != null) {

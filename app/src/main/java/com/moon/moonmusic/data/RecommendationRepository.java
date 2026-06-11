@@ -65,6 +65,10 @@ public class RecommendationRepository {
         void onResult(RemoteRecommendation recommendation);
     }
 
+    /**
+     * 异步加载今日推荐。
+     * NicholasFragment 调用后会通过回调拿到推荐对象，再切回主线程刷新页面。
+     */
     public static void loadTodayRecommendation(Callback callback) {
         // 网络请求不能放在主线程，否则 Android 会抛异常并卡住界面；这里开子线程请求 iTunes。
         new Thread(() -> {
@@ -86,6 +90,10 @@ public class RecommendationRepository {
         return parseRecommendation(json, 0);
     }
 
+    /**
+     * 把接口返回的 JSON 解析成页面需要的推荐对象。
+     * preferredIndex 用来从结果列表中选择不同歌曲，接口数据缺字段时会补默认值。
+     */
     public static RemoteRecommendation parseRecommendation(String json, int preferredIndex) throws Exception {
         JSONObject obj = new JSONObject(json);
         JSONArray results = obj.optJSONArray("results");
@@ -121,6 +129,10 @@ public class RecommendationRepository {
         );
     }
 
+    /**
+     * 获取本地兜底推荐。
+     * 网络失败或接口没有返回结果时使用它，游标会递增以轮换不同推荐内容。
+     */
     public static RemoteRecommendation getFallbackRecommendation() {
         RemoteRecommendation recommendation = FALLBACK_RECOMMENDATIONS[normalizeIndex(fallbackCursor, FALLBACK_RECOMMENDATIONS.length)];
         fallbackCursor++;
@@ -144,6 +156,10 @@ public class RecommendationRepository {
         return normalized < 0 ? normalized + size : normalized;
     }
 
+    /**
+     * 使用 HttpURLConnection 请求 JSON 字符串。
+     * 方法内部负责设置超时、读取响应体，并在完成后关闭网络连接。
+     */
     private static String requestJson(String urlText) throws Exception {
         HttpURLConnection connection = null;
         try {
@@ -172,6 +188,10 @@ public class RecommendationRepository {
         }
     }
 
+    /**
+     * 读取接口返回的输入流并拼成完整字符串。
+     * requestJson 会把正常响应和错误响应都交给这里统一读取。
+     */
     private static String readAll(InputStream inputStream) throws Exception {
         if (inputStream == null) return "";
         StringBuilder sb = new StringBuilder();
@@ -193,6 +213,10 @@ public class RecommendationRepository {
         return String.valueOf(value).replace('\n', ' ').trim();
     }
 
+    /**
+     * 把接口返回的小尺寸封面地址替换成更适合页面显示的尺寸。
+     * 如果接口没有封面地址，调用方会继续使用本地封面。
+     */
     private static String upgradeArtworkUrl(String artworkUrl) {
         if (artworkUrl.isEmpty()) return "";
         // iTunes 默认图较小，把 100x100 替换成 300x300，封面显示时会更清晰。

@@ -63,6 +63,10 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btn_login);
     }
 
+    /**
+     * 准备用户数据库访问对象，并检查是否已有登录态。
+     * 如果 SharedPreferences 中存在账号，就直接进入主页面。
+     */
     private void initData() {
         userDao = new UserDao(this);
         // 如果已登录，直接进入主页，避免用户每次打开 App 都重新登录。
@@ -73,11 +77,19 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 绑定登录页的两个主要操作。
+     * 注册按钮会先写入数据库再登录，登录按钮会校验已有账号。
+     */
     private void initListener() {
         btnRegisterLogin.setOnClickListener(v -> doRegisterAndLogin());
         btnLogin.setOnClickListener(v -> doLogin());
     }
 
+    /**
+     * 处理注册并登录流程。
+     * 方法会校验必填项、检查 QQ 是否重复，写库成功后保存登录态并跳转主页。
+     */
     private void doRegisterAndLogin() {
         String nickname = etNickname.getText().toString().trim();
         String qq = etQq.getText().toString().trim();
@@ -110,6 +122,10 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 处理已有账号登录流程。
+     * 登录成功后把账号、昵称和头像类型保存起来，后续我的页面会读取这些信息。
+     */
     private void doLogin() {
         String qq = etQq.getText().toString().trim();
         String pwd = etPwd.getText().toString();
@@ -131,6 +147,10 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 汇总用户勾选的音乐偏好。
+     * 多个复选框会拼成逗号分隔的字符串，注册时一起保存到用户表。
+     */
     private String buildHobbies() {
         StringBuilder sb = new StringBuilder();
         // 把多个复选框选择拼成一个字符串存库，便于后续一次性读取用户偏好。

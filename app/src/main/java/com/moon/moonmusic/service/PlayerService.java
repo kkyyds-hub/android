@@ -51,6 +51,10 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         return binder;
     }
 
+    /**
+     * Service 创建时准备播放列表、播放器对象和通知通道。
+     * Activity 绑定服务后会复用这里初始化出的 MediaPlayer。
+     */
     @Override
     public void onCreate() {
         super.onCreate();
@@ -60,6 +64,10 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         createNotificationChannelIfNeeded();
     }
 
+    /**
+     * 接收页面、通知栏或广播转发过来的播放命令。
+     * 前台通知会先启动起来，避免前台服务启动后没有及时显示通知。
+     */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // 兼容 Android 8+ 的 startForegroundService：无论当前是否播放，都先立刻拉起前台通知
@@ -72,6 +80,10 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         return START_STICKY;
     }
 
+    /**
+     * 根据 Intent action 分发播放命令。
+     * 播放页按钮和通知栏按钮最终都会转成这里能识别的动作。
+     */
     private void handleAction(Intent intent) {
         String action = intent.getAction();
         // 通知栏按钮、播放器按钮、页面跳转都转成这些 action，Service 只需要集中处理播放命令。
@@ -95,6 +107,10 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         }
     }
 
+    /**
+     * 确保 MediaPlayer 已经创建，并设置播放完成监听。
+     * 其它播放控制方法调用前会先走这里，避免空对象导致播放失败。
+     */
     private void ensurePlayer() {
         if (mediaPlayer == null) {
             // MediaPlayer 是音频播放核心对象，放在 Service 中可以让离开播放器页面后音乐继续播放。
@@ -129,6 +145,10 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         }
     }
 
+    /**
+     * 跳转到指定播放进度。
+     * PlayerActivity 的进度条松手后会把毫秒值传到这里。
+     */
     public void seekTo(int ms) {
         try {
             // SeekBar 拖动后的毫秒位置最终会走到这里，交给 MediaPlayer 跳转播放进度。
@@ -137,6 +157,10 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         }
     }
 
+    /**
+     * 在播放和暂停之间切换。
+     * 播放页按钮和通知栏按钮都会调用这个方法，执行后会同步更新前台通知。
+     */
     public void togglePlayPause() {
         if (mediaPlayer == null) return;
         try {
@@ -169,6 +193,10 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         }
     }
 
+    /**
+     * 切到播放列表中的下一首。
+     * 播放完成回调和下一首按钮都会复用这个方法。
+     */
     public void next() {
         if (playlist == null || playlist.isEmpty()) return;
         // 取模让最后一首的下一首回到第一首，形成简单循环播放列表。
@@ -176,6 +204,10 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         setSongInternal(getCurrentSong(), currentFromDownload, true);
     }
 
+    /**
+     * 切到播放列表中的上一首。
+     * 当前已经是第一首时会回到列表最后一首，保持循环列表体验。
+     */
     public void prev() {
         if (playlist == null || playlist.isEmpty()) return;
         // 加上 playlist.size() 再取模，避免第一首点上一首时出现负数下标。
@@ -183,6 +215,10 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         setSongInternal(getCurrentSong(), currentFromDownload, true);
     }
 
+    /**
+     * 根据歌曲编号定位播放列表中的歌曲。
+     * 首页、专区和下载页进入播放器时，都会通过歌曲 id 让服务切到对应音频。
+     */
     public void setSongById(int songId, boolean fromDownload, boolean autoPlay) {
         if (playlist == null || playlist.isEmpty()) return;
         for (int i = 0; i < playlist.size(); i++) {
@@ -194,6 +230,10 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         setSongInternal(getCurrentSong(), fromDownload, autoPlay);
     }
 
+    /**
+     * 切换 MediaPlayer 的数据源并按需开始播放。
+     * 如果从下载页进入且本地文件存在，就优先播放下载文件，否则回退到 assets 音频。
+     */
     private void setSongInternal(Song song, boolean fromDownload, boolean autoPlay) {
         if (song == null) return;
         ensurePlayer();
@@ -248,6 +288,10 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         next();
     }
 
+    /**
+     * Service 销毁时释放 MediaPlayer。
+     * 这里是音频资源回收的位置，避免页面退出后仍占用解码器和文件句柄。
+     */
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -261,6 +305,10 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         }
     }
 
+    /**
+     * 创建播放通知需要使用的通知通道。
+     * Android 8 及以上必须先有通道，前台通知才能正常显示。
+     */
     private void createNotificationChannelIfNeeded() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             // Android 8 以后通知必须属于某个 Channel，前台播放通知也不例外。
@@ -280,6 +328,10 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         startForeground(AppConstants.NOTI_ID, buildNotification());
     }
 
+    /**
+     * 构建播放中的前台通知。
+     * 通知里的上一首、播放暂停、下一首和停止按钮会通过广播回到 PlayerService。
+     */
     private Notification buildNotification() {
         Song song = getCurrentSong();
         String title = song == null ? "MOON MUSIC" : song.getTitle();

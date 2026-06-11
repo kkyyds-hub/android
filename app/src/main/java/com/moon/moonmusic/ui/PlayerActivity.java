@@ -128,6 +128,10 @@ public class PlayerActivity extends AppCompatActivity {
         initListener();
     }
 
+    /**
+     * 读取 Intent 中传入的歌曲编号，并记录是否从下载页进入播放器。
+     * 后续渲染歌曲信息和启动播放服务都会使用这两个值。
+     */
     private void parseIntent() {
         Intent it = getIntent();
         if (it != null) {
@@ -137,6 +141,10 @@ public class PlayerActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 绑定播放器页面中的控件，并根据屏幕高度调整首屏区域。
+     * onCreate 初始化页面后会调用它，后续监听器和数据渲染都依赖这些控件引用。
+     */
     private void initView() {
         tvTitle = findViewById(R.id.tv_music_title);
         tvType = findViewById(R.id.tv_type);
@@ -164,12 +172,20 @@ public class PlayerActivity extends AppCompatActivity {
         btnCoverEffect = findViewById(R.id.btn_cover_effect);
     }
 
+    /**
+     * 根据入口歌曲编号刷新首屏内容，并设置播放按钮的初始图标。
+     * 真正的播放状态会在绑定 PlayerService 后由定时刷新任务同步。
+     */
     private void initData() {
         renderSong(songId);
         // 初始图标先显示播放，真正状态随后由 ticker 根据 MediaPlayer 同步。
         btnPlayPause.setImageResource(R.drawable.ic_player_play);
     }
 
+    /**
+     * 注册播放器页面的所有用户操作。
+     * 按钮会调用 PlayerService 控制播放，下载按钮会把任务交给 DownloadService。
+     */
     private void initListener() {
         btnPrev.setOnClickListener(v -> {
             if (!bound) return;
@@ -235,6 +251,10 @@ public class PlayerActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * 根据当前歌曲编号刷新播放器页面。
+     * 这里会统一更新封面、歌名、风格、歌词和下载按钮状态。
+     */
     private void renderSong(int id) {
         List<Song> list = SongRepository.getPlayableSongList();
         Song found = null;
@@ -272,15 +292,23 @@ public class PlayerActivity extends AppCompatActivity {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * 计算封面特效的下一个状态。
+     * 封面按钮每点一次都会按原图、旋转、灰度放大的顺序循环切换。
+     */
     public static int nextCoverEffectMode(int currentMode) {
         if (currentMode == EFFECT_NORMAL) return EFFECT_ROTATE;
         if (currentMode == EFFECT_ROTATE) return EFFECT_GRAY_SCALE;
         return EFFECT_NORMAL;
     }
 
+    /**
+     * 按当前特效状态处理封面图片。
+     * 切歌或点击特效按钮后都会调用它，先清理旧效果再应用新的动画或滤镜。
+     */
     private void applyCoverEffect() {
         if (ivCover == null || btnCoverEffect == null) return;
-        // 每次应用新特效前先清空旧动画和滤镜，避免多种效果叠在一起难以讲清。
+        // 每次应用新特效前先清空旧动画和滤镜，避免多种效果互相叠加。
         ivCover.animate().cancel();
         ivCover.clearColorFilter();
         ivCover.setRotation(0f);
@@ -309,6 +337,10 @@ public class PlayerActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 按系统版本选择启动播放服务的方式。
+     * Android 8 及以上需要使用前台服务入口，低版本继续走普通服务启动。
+     */
     private static void startForegroundServiceCompat(Context context, Intent intent) {
         // Android 8 以后启动前台服务要用 startForegroundService，低版本继续用 startService。
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -318,6 +350,10 @@ public class PlayerActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 页面销毁时停止定时刷新并解绑播放服务。
+     * 这里只释放 Activity 和 Service 的连接，不直接停止音乐播放。
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();

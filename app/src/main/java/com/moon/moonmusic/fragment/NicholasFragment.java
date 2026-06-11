@@ -118,6 +118,10 @@ public class NicholasFragment extends Fragment {
         btnLocation = view.findViewById(R.id.btn_nicholas_location);
     }
 
+    /**
+     * 准备专区页初始数据。
+     * 这里会加载静态介绍、专区歌曲列表、默认定位推荐，并立即发起一次网络推荐请求。
+     */
     private void initData() {
         // 静态文案来自 Repository，页面只负责展示，数据层和界面层保持分工。
         tvAlbums.setText(NicholasRepository.getAlbumWallIntro());
@@ -129,6 +133,10 @@ public class NicholasFragment extends Fragment {
         loadNetworkRecommendation();
     }
 
+    /**
+     * 注册专区页中的跳转、刷新和播放入口。
+     * 用户点击不同卡片时，会分别进入详情页、视频页、播放器或触发定位推荐。
+     */
     private void initListener() {
         btnDetail.setOnClickListener(v -> openDetail());
         // 视频页入口：从专区跳转到 VideoActivity，播放本地视频并联动音浪 View。
@@ -151,6 +159,10 @@ public class NicholasFragment extends Fragment {
         });
     }
 
+    /**
+     * 加载线上推荐歌曲。
+     * 请求由 RecommendationRepository 在子线程执行，拿到结果后切回主线程刷新推荐卡片。
+     */
     private void loadNetworkRecommendation() {
         renderNetworkLoading();
         pulseNetworkCard();
@@ -168,6 +180,10 @@ public class NicholasFragment extends Fragment {
         tvNetworkSource.setText("稍后呈现");
     }
 
+    /**
+     * 把推荐对象渲染到网络推荐卡片。
+     * 文案更新完成后会继续处理封面，网络封面不可用时保留本地封面。
+     */
     private void renderNetworkRecommendation(RemoteRecommendation recommendation) {
         if (recommendation == null) return;
         currentRecommendation = recommendation;
@@ -180,6 +196,10 @@ public class NicholasFragment extends Fragment {
         renderNetworkCover(recommendation);
     }
 
+    /**
+     * 渲染推荐封面。
+     * 先放本地封面保证页面稳定，再尝试下载网络封面并回到主线程替换图片。
+     */
     private void renderNetworkCover(RemoteRecommendation recommendation) {
         // 先显示本地封面，保证网络慢或断网时卡片也不空白。
         setLocalNetworkCover(recommendation.getLocalArtworkName());
@@ -206,6 +226,10 @@ public class NicholasFragment extends Fragment {
         return R.drawable.nicholas_album_viva;
     }
 
+    /**
+     * 下载并解码网络封面图片。
+     * renderNetworkCover 会在子线程调用它，失败时返回 null 并继续使用本地封面。
+     */
     private Bitmap downloadBitmap(String urlText) {
         HttpURLConnection connection = null;
         try {
@@ -225,6 +249,10 @@ public class NicholasFragment extends Fragment {
         }
     }
 
+    /**
+     * 处理定位歌单按钮点击。
+     * 已有定位权限时直接读取位置，否则发起运行时权限申请。
+     */
     private void handleLocationPlaylistRequest() {
         if (hasLocationPermission()) {
             loadLocationPlaylist();
@@ -237,6 +265,10 @@ public class NicholasFragment extends Fragment {
         );
     }
 
+    /**
+     * 读取设备最近位置并生成定位歌单。
+     * 如果暂时拿不到位置，就回退到默认推荐，保证卡片仍有可点击内容。
+     */
     @SuppressLint("MissingPermission")
     private void loadLocationPlaylist() {
         LocationManager locationManager = (LocationManager) requireContext().getSystemService(Context.LOCATION_SERVICE);
@@ -253,6 +285,10 @@ public class NicholasFragment extends Fragment {
         toast("已根据当前位置更新歌单");
     }
 
+    /**
+     * 从多个定位来源中选择最近一次可用位置。
+     * loadLocationPlaylist 会调用这里，优先使用时间最新的定位结果。
+     */
     @SuppressLint("MissingPermission")
     private Location getBestLastKnownLocation(LocationManager locationManager) {
         if (locationManager == null) return null;
@@ -281,6 +317,10 @@ public class NicholasFragment extends Fragment {
                 || ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
+    /**
+     * 把定位推荐结果渲染到定位歌单卡片。
+     * 同时记录当前推荐，用户点击卡片时会根据它跳转到播放器。
+     */
     private void renderLocationRecommendation(LocationPlaylistRecommendation recommendation) {
         if (recommendation == null) return;
         currentLocationRecommendation = recommendation;
@@ -293,6 +333,10 @@ public class NicholasFragment extends Fragment {
         btnLocation.setText(recommendation.isFromLocation() ? "重新定位" : "定位歌单");
     }
 
+    /**
+     * 打开当前定位歌单对应的主打歌曲。
+     * 如果当前位置推荐还没准备好，就使用默认推荐作为兜底。
+     */
     private void openLocationSong() {
         LocationPlaylistRecommendation recommendation = currentLocationRecommendation;
         if (recommendation == null) {
@@ -325,6 +369,10 @@ public class NicholasFragment extends Fragment {
         }
     }
 
+    /**
+     * 打开艺人档案页。
+     * 详情页内部会加载本地 H5，用于承载更完整的图文资料。
+     */
     private void openDetail() {
         // 详情页使用 WebView 加载本地 H5，承载更完整的图文资料。
         startActivity(new Intent(requireContext(), RecommendationDetailActivity.class));
@@ -343,6 +391,10 @@ public class NicholasFragment extends Fragment {
         Toast.makeText(requireContext(), text, Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * 播放专区页卡片的入场动画。
+     * onViewCreated 初始化完成后调用，让主要内容依次出现。
+     */
     private void playEntranceAnimation() {
         View[] cards = new View[]{heroCard, scoreCard, exploreCard, albumsCard, songsCard};
         for (int i = 0; i < cards.length; i++) {
@@ -361,6 +413,10 @@ public class NicholasFragment extends Fragment {
         }
     }
 
+    /**
+     * 给可点击区域添加按压缩放反馈。
+     * initListener 会给按钮和卡片调用它，让触摸反馈保持一致。
+     */
     private void addPressAnimation(View view) {
         if (view == null) return;
         view.setOnTouchListener((v, event) -> {

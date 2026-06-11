@@ -54,6 +54,10 @@ public class DownloadFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_download, container, false);
     }
 
+    /**
+     * 准备下载列表并注册播放入口。
+     * 用户点击下载歌曲时，会带上“从下载页播放”的标记进入播放器。
+     */
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -93,6 +97,10 @@ public class DownloadFragment extends Fragment {
         }
     }
 
+    /**
+     * 扫描本地下载目录并刷新列表。
+     * onResume 和下载完成广播都会调用它，确保页面只显示真实存在的本地歌曲。
+     */
     private void refresh() {
         data.clear();
         List<Song> all = SongRepository.getPlayableSongList();

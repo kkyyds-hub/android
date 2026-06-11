@@ -65,6 +65,10 @@ public class VideoActivity extends AppCompatActivity {
         musicWaveView = findViewById(R.id.v_live_music_wave);
     }
 
+    /**
+     * 初始化视频标题、系统控制条和视频准备完成后的回调。
+     * 视频准备好后会自动播放，并启动音浪 View 的状态同步。
+     */
     private void initData() {
         tvTitle.setText(VIDEO_TITLE);
         // MediaController 是 Android 自带的视频控制条，提供播放、暂停、拖动进度等基础能力。
@@ -88,6 +92,10 @@ public class VideoActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> finish());
     }
 
+    /**
+     * 设置本地视频资源并显示加载状态。
+     * VideoView 会异步准备视频，准备完成后触发 initData 中注册的回调。
+     */
     private void playVivaLiveClip() {
         tvVideoStatus.setText(STATUS_LOADING);
         // 视频放在 res/raw 中，通过 android.resource:// 形式交给 VideoView 播放。
@@ -113,11 +121,19 @@ public class VideoActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 根据 VideoView 的播放状态同步音浪动画。
+     * 定时任务会反复调用这里，让视频暂停时绘图也停止刷新。
+     */
     private void syncWaveWithVideoState() {
         if (videoView == null) return;
         setWaveAnimating(videoView.isPlaying());
     }
 
+    /**
+     * 开启或关闭自定义音浪动画。
+     * 内部会避免重复设置同一个状态，减少不必要的 invalidate 调用。
+     */
     private void setWaveAnimating(boolean animating) {
         if (musicWaveView == null || waveAnimating == animating) return;
         waveAnimating = animating;
@@ -125,6 +141,10 @@ public class VideoActivity extends AppCompatActivity {
         musicWaveView.setAnimationEnabled(animating);
     }
 
+    /**
+     * 页面进入后台时暂停视频和音浪刷新。
+     * 这样离开视频页后不会继续占用播放和绘图资源。
+     */
     @Override
     protected void onPause() {
         super.onPause();
@@ -136,6 +156,10 @@ public class VideoActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 页面销毁时停止视频播放并移除音浪同步任务。
+     * 这是 VideoView 和自定义 View 联动关系的收尾位置。
+     */
     @Override
     protected void onDestroy() {
         stopWaveSync();
