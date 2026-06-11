@@ -1,0 +1,6 @@
+因为爱所以爱 - 谢霆锋
+
+课程演示试听片段。
+这首歌放在专区第一首，用来展示谢霆锋音乐推荐的播放链路。
+
+知识点：专区列表 -> PlayerActivity -> PlayerService -> MediaPlayer 播放 assets 音频。

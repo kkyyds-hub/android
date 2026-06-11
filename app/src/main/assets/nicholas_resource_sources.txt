@@ -1,0 +1,29 @@
+Nicholas Tse course-demo visual resources
+
+Artist photo:
+https://commons.wikimedia.org/wiki/File:NICHOLAS_TSE_TING_FUNG_2017.02.13_(cropped).jpg
+https://commons.wikimedia.org/wiki/File:%E8%AC%9D%E9%9C%86%E9%8B%92_Nicholas_Tse_2021_(1).jpg
+https://commons.wikimedia.org/wiki/File:%E8%AC%9D%E9%9C%86%E9%8B%92_Nicholas_Tse_2024_(2).png
+
+Album artwork thumbnails:
+https://itunes.apple.com/search?term=%E4%BA%86%E8%A7%A3%20%E8%AC%9D%E9%9C%86%E9%8B%92&entity=album
+https://itunes.apple.com/search?term=Nicholas%20Tse%201999&entity=album
+https://itunes.apple.com/search?term=Nicholas%20Tse%20Viva&entity=album
+https://itunes.apple.com/search?term=%E7%8E%89%E8%9D%B4%E8%9D%B6%20%E8%AC%9D%E9%9C%86%E9%8B%92&entity=album
+https://itunes.apple.com/search?term=Nicholas%20Tse%20Me&entity=album
+https://itunes.apple.com/lookup?id=546344385&entity=album
+
+Playable audio previews:
+https://itunes.apple.com/search?term=%E8%AC%9D%E9%9C%86%E9%8B%92%20%E5%9B%A0%E7%82%BA%E6%84%9B%E6%89%80%E4%BB%A5%E6%84%9B&entity=song
+https://itunes.apple.com/search?term=%E8%AC%9D%E9%9C%86%E9%8B%92%20%E8%AC%9D%E8%AC%9D%E4%BD%A0%E7%9A%84%E6%84%9B1999&entity=song
+https://itunes.apple.com/search?term=%E8%AC%9D%E9%9C%86%E9%8B%92%20%E9%BB%83%E7%A8%AE%E4%BA%BA&entity=song
+https://itunes.apple.com/search?term=Nicholas%20Tse%20Viva&entity=song
+https://itunes.apple.com/search?term=%E8%AC%9D%E9%9C%86%E9%8B%92%20%E7%8E%89%E8%9D%B4%E8%9D%B6&entity=song
+
+Previous video preview:
+https://itunes.apple.com/search?term=%E8%AC%9D%E9%9C%86%E9%8B%92&entity=musicVideo
+https://video-ssl.itunes.apple.com/itunes-assets/Video211/v4/43/3f/18/433f1863-b26b-8d94-93b7-1a51503853dc/mzvf_10413424089057571595.1920w.h264lc.U.p.m4v
+
+Viva Live local clip:
+https://www.bilibili.com/video/BV1o64y127G4
+Course-demo local excerpt saved as app/src/main/res/raw/nicholas_viva_live_2000.mp4.

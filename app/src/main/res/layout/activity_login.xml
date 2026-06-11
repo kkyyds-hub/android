@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/iv_bg"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/login_bg"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_top_safe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.35" />
+
+    <LinearLayout
+        android:id="@+id/ll_card"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:background="@drawable/bg_card_dark"
+        android:orientation="vertical"
+        android:padding="16dp"
+        app:layout_constraintTop_toBottomOf="@id/gl_top_safe"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <EditText
+            android:id="@+id/et_nickname"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_marginTop="12dp"
+            android:hint="昵称"
+            android:background="@android:color/transparent"
+            android:textColor="@android:color/white"
+            android:textColorHint="#99FFFFFF"
+            android:padding="8dp"/>
+
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#33FFFFFF"/>
+
+        <EditText
+            android:id="@+id/et_qq"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:hint="QQ号"
+            android:inputType="number"
+            android:background="@android:color/transparent"
+            android:textColor="@android:color/white"
+            android:textColorHint="#99FFFFFF"
+            android:padding="8dp"/>
+
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#33FFFFFF"/>
+
+        <EditText
+            android:id="@+id/et_pwd"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:hint="密码"
+            android:inputType="textPassword"
+            android:background="@android:color/transparent"
+            android:textColor="@android:color/white"
+            android:textColorHint="#99FFFFFF"
+            android:padding="8dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="性别"
+            android:textColor="#CCFFFFFF"
+            android:layout_marginTop="8dp"/>
+
+        <RadioGroup
+            android:id="@+id/rg_gender"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/rb_male"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="男"
+                android:textColor="@android:color/white"
+                android:buttonTint="#CCFFFFFF"/>
+
+            <RadioButton
+                android:id="@+id/rb_female"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="女"
+                android:textColor="@android:color/white"
+                android:buttonTint="#CCFFFFFF"/>
+        </RadioGroup>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="偏好"
+            android:textColor="#CCFFFFFF"
+            android:layout_marginTop="4dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/cb_pop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="流行"
+                android:textColor="@android:color/white"
+                android:buttonTint="#CCFFFFFF"/>
+
+            <CheckBox
+                android:id="@+id/cb_rock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="摇滚"
+                android:textColor="@android:color/white"
+                android:buttonTint="#CCFFFFFF"/>
+
+            <CheckBox
+                android:id="@+id/cb_folk"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="民谣"
+                android:textColor="@android:color/white"
+                android:buttonTint="#CCFFFFFF"/>
+
+            <CheckBox
+                android:id="@+id/cb_classic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="经典"
+                android:textColor="@android:color/white"
+                android:buttonTint="#CCFFFFFF"/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_register_login"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_btn_primary"
+            android:text="注册并登录"
+            android:textColor="@color/moon_white"/>
+
+        <Button
+            android:id="@+id/btn_login"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_btn_ghost_dark"
+            android:text="已有账号直接登录"
+            android:textColor="@android:color/white"/>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

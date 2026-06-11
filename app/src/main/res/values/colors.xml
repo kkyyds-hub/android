@@ -1,0 +1,8 @@
+<resources>
+    <color name="moon_purple">#7B4BFF</color>
+    <color name="moon_purple_dark">#5E35FF</color>
+    <color name="moon_white">#FFFFFF</color>
+    <color name="moon_black">#111111</color>
+    <color name="moon_card">#CCFFFFFF</color>
+    <color name="moon_card_dark">#CC000000</color>
+</resources>

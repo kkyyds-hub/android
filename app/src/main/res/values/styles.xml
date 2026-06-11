@@ -1,0 +1,14 @@
+<resources>
+
+    <!-- Shape overlays used by ShapeableImageView to avoid relying on platform/Material internal styles -->
+    <style name="ShapeAppearanceOverlay.App.Corner.Full">
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <style name="ShapeAppearanceOverlay.App.Corner.Medium">
+        <item name="cornerSize">12dp</item>
+    </style>
+    <style name="ShapeAppearanceOverlay.App.Corner" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item> </style>
+</resources>

@@ -1,0 +1,14 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.MoonMusic" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/moon_purple</item>
+        <item name="colorPrimaryVariant">@color/moon_purple_dark</item>
+        <item name="colorOnPrimary">@color/moon_white</item>
+        <item name="colorSecondary">@color/moon_purple</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">true</item>
+    </style>
+</resources>
