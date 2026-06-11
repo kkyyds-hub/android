@@ -42,6 +42,10 @@ import java.util.List;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+/**
+ * 谢霆锋专区：把网络推荐、定位歌单、歌曲列表、详情页和视频页入口集中到一个页面。
+ * 包含网络推荐、网络图片下载、定位歌单、ListView 歌曲跳转、WebView 详情页和 VideoView 视频页入口。
+ */
 public class NicholasFragment extends Fragment {
 
     private static final int REQUEST_LOCATION_PERMISSION = 701;
@@ -115,16 +119,19 @@ public class NicholasFragment extends Fragment {
     }
 
     private void initData() {
+        // 静态文案来自 Repository，页面只负责展示，数据层和界面层保持分工。
         tvAlbums.setText(NicholasRepository.getAlbumWallIntro());
         tvFeatures.setText(NicholasRepository.getRecommendationIntro());
         songData = SongRepository.getNicholasSongList();
         lvSongs.setAdapter(new SongListAdapter(requireContext(), songData));
+        // 定位推荐先显示默认内容，用户点按钮授权后再尝试按真实位置更新。
         renderLocationRecommendation(LocationPlaylistRepository.getDefaultRecommendation());
         loadNetworkRecommendation();
     }
 
     private void initListener() {
         btnDetail.setOnClickListener(v -> openDetail());
+        // 视频页入口：从专区跳转到 VideoActivity，播放本地视频并联动音浪 View。
         btnVideo.setOnClickListener(v -> startActivity(new Intent(requireContext(), VideoActivity.class)));
         btnNetwork.setOnClickListener(v -> loadNetworkRecommendation());
         btnLocation.setOnClickListener(v -> handleLocationPlaylistRequest());
@@ -138,6 +145,7 @@ public class NicholasFragment extends Fragment {
         lvSongs.setOnItemClickListener((parent, view, position, id) -> {
             Song song = songData.get(position);
             Intent it = new Intent(requireContext(), PlayerActivity.class);
+            // 点击专区歌曲后跳到播放器，PlayerActivity 再通过 songId 找到 assets 中的音频和歌词。
             it.putExtra(PlayerActivity.EXTRA_SONG_ID, song.getId());
             startActivity(it);
         });
@@ -146,6 +154,7 @@ public class NicholasFragment extends Fragment {
     private void loadNetworkRecommendation() {
         renderNetworkLoading();
         pulseNetworkCard();
+        // HTTP 请求在 Repository 的子线程里执行，返回后必须切回主线程更新 TextView/ImageView。
         RecommendationRepository.loadTodayRecommendation(recommendation -> {
             if (getActivity() == null) return;
             getActivity().runOnUiThread(() -> renderNetworkRecommendation(recommendation));
@@ -162,6 +171,7 @@ public class NicholasFragment extends Fragment {
     private void renderNetworkRecommendation(RemoteRecommendation recommendation) {
         if (recommendation == null) return;
         currentRecommendation = recommendation;
+        // 网络 JSON 解析后的结果统一映射成 RemoteRecommendation，页面不直接处理原始 JSON。
         tvNetworkTag.setText(recommendation.getTag());
         tvNetworkTitle.setText(recommendation.getTitle());
         tvNetworkReason.setText(recommendation.getReason());
@@ -171,10 +181,12 @@ public class NicholasFragment extends Fragment {
     }
 
     private void renderNetworkCover(RemoteRecommendation recommendation) {
+        // 先显示本地封面，保证网络慢或断网时卡片也不空白。
         setLocalNetworkCover(recommendation.getLocalArtworkName());
         String artworkUrl = recommendation.getArtworkUrl();
         if (artworkUrl == null || artworkUrl.trim().isEmpty()) return;
         new Thread(() -> {
+            // 网络图片下载同样不能放主线程；Bitmap 下载完成后再回到主线程设置 ImageView。
             Bitmap bitmap = downloadBitmap(artworkUrl);
             if (bitmap == null || getActivity() == null) return;
             getActivity().runOnUiThread(() -> ivNetworkCover.setImageBitmap(bitmap));
@@ -199,6 +211,7 @@ public class NicholasFragment extends Fragment {
         try {
             URL url = new URL(urlText);
             connection = (HttpURLConnection) url.openConnection();
+            // 这里先通过 HTTP 拿到图片流，再用 BitmapFactory 解码成 Bitmap。
             connection.setConnectTimeout(4000);
             connection.setReadTimeout(4000);
             connection.setRequestProperty("Accept", "image/*");
@@ -217,6 +230,7 @@ public class NicholasFragment extends Fragment {
             loadLocationPlaylist();
             return;
         }
+        // 定位属于危险权限，必须运行时申请；用户同意后回调 onRequestPermissionsResult。
         requestPermissions(
                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
                 REQUEST_LOCATION_PERMISSION
@@ -228,6 +242,7 @@ public class NicholasFragment extends Fragment {
         LocationManager locationManager = (LocationManager) requireContext().getSystemService(Context.LOCATION_SERVICE);
         Location location = getBestLastKnownLocation(locationManager);
         if (location == null) {
+            // 真机可能暂时没有缓存定位，使用默认歌单保证页面仍有可用内容。
             renderLocationRecommendation(LocationPlaylistRepository.getDefaultRecommendation());
             pulseLocationCard();
             toast("暂未获取到设备位置，已使用默认城市歌单");
@@ -247,6 +262,7 @@ public class NicholasFragment extends Fragment {
                 LocationManager.PASSIVE_PROVIDER
         };
         Location bestLocation = null;
+        // 同时尝试 GPS、网络和被动定位，取时间最新的一条，比只查一个来源更稳定。
         for (String provider : providers) {
             try {
                 Location location = locationManager.getLastKnownLocation(provider);
@@ -254,7 +270,7 @@ public class NicholasFragment extends Fragment {
                     bestLocation = location;
                 }
             } catch (IllegalArgumentException | SecurityException ignored) {
-                // Some devices do not expose every provider; skip unavailable providers.
+                // 有些设备不支持所有 provider，跳过不可用来源即可。
             }
         }
         return bestLocation;
@@ -272,6 +288,7 @@ public class NicholasFragment extends Fragment {
         tvLocationTitle.setText(recommendation.getTitle());
         tvLocationReason.setText(recommendation.getReason());
         String mode = recommendation.isFromLocation() ? "设备位置" : "本地兜底";
+        // 页面上显示来源，让用户知道当前是定位结果还是兜底推荐。
         tvLocationSource.setText("来源：" + recommendation.getSource() + " · " + mode);
         btnLocation.setText(recommendation.isFromLocation() ? "重新定位" : "定位歌单");
     }
@@ -282,6 +299,7 @@ public class NicholasFragment extends Fragment {
             recommendation = LocationPlaylistRepository.getDefaultRecommendation();
         }
         Intent it = new Intent(requireContext(), PlayerActivity.class);
+        // 点击定位歌单卡片时，直接播放推荐结果里配置的主打歌曲。
         it.putExtra(PlayerActivity.EXTRA_SONG_ID, recommendation.getPrimarySongId());
         startActivity(it);
     }
@@ -300,6 +318,7 @@ public class NicholasFragment extends Fragment {
         if (granted) {
             loadLocationPlaylist();
         } else {
+            // 用户拒绝权限时仍给出可体验的本地歌单，不让页面停在空状态。
             renderLocationRecommendation(LocationPlaylistRepository.getPermissionDeniedRecommendation());
             pulseLocationCard();
             toast("定位权限未开启，已使用手动体验歌单");
@@ -307,6 +326,7 @@ public class NicholasFragment extends Fragment {
     }
 
     private void openDetail() {
+        // 详情页使用 WebView 加载本地 H5，承载更完整的图文资料。
         startActivity(new Intent(requireContext(), RecommendationDetailActivity.class));
     }
 
@@ -328,6 +348,7 @@ public class NicholasFragment extends Fragment {
         for (int i = 0; i < cards.length; i++) {
             View card = cards[i];
             if (card == null) continue;
+            // 页面进入时让卡片依次上浮，属于普通 View 动画，不改变业务数据。
             card.setAlpha(0f);
             card.setTranslationY(dp(18));
             card.animate()
@@ -343,6 +364,7 @@ public class NicholasFragment extends Fragment {
     private void addPressAnimation(View view) {
         if (view == null) return;
         view.setOnTouchListener((v, event) -> {
+            // 给可点击卡片加轻微缩放反馈，用户能直观看到自己点到了哪个功能入口。
             if (event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
                 v.animate().scaleX(0.97f).scaleY(0.97f).setDuration(90).start();
             } else if (event.getAction() == android.view.MotionEvent.ACTION_UP

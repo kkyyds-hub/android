@@ -35,10 +35,11 @@ import java.util.List;
  * - SeekBar + 时间显示 + 上一首/播放暂停/下一首/返回
  * - 歌词从 assets/lyrics 读取（可滚动）
  * - “下载”按钮：复制到 App 专属外部目录，下载页可播放
+ * - 封面特效按钮负责图片旋转、ColorMatrix 灰度滤镜和缩放动画
  */
 public class PlayerActivity extends AppCompatActivity {
 
-    // 兼容你工程里其它页面的引用（HomeFragment / DownloadFragment）
+    // 这些 key 是页面跳转时的“约定”，列表页、下载页和播放器都靠它们传递同一首歌。
     public static final String EXTRA_SONG_ID = "song_id";
     public static final String EXTRA_PLAY_FROM_DOWNLOAD = "play_from_download";
     public static final int EFFECT_NORMAL = 0;
@@ -73,7 +74,7 @@ public class PlayerActivity extends AppCompatActivity {
                     tvTotal.setText(TimeUtil.formatMs(dur));
                 }
 
-                // Icon sync
+                // 播放进度由 Service 中的 MediaPlayer 提供，Activity 只负责每 0.5 秒刷新界面。
                 btnPlayPause.setImageResource(playerService.isPlaying()
                         ? R.drawable.ic_player_pause
                         : R.drawable.ic_player_play);
@@ -88,7 +89,7 @@ public class PlayerActivity extends AppCompatActivity {
             PlayerService.PlayerBinder b = (PlayerService.PlayerBinder) service;
             playerService = b.getService();
             bound = true;
-            // 设置并播放
+            // 绑定成功后才能调用 Service 方法；这里根据 Intent 传入的歌曲 id 设置并播放。
             playerService.setSongById(songId, playFromDownload, true);
             renderSong(songId);
             handler.post(ticker);
@@ -109,7 +110,7 @@ public class PlayerActivity extends AppCompatActivity {
         parseIntent();
         inis();
 
-        // 启动并绑定播放服务
+        // 先启动前台服务保证音乐可持续播放，再 bind 让本页面能控制播放、暂停和进度。
         Intent svc = new Intent(this, PlayerService.class);
         svc.setAction(AppConstants.ACTION_SET_SONG);
         svc.putExtra(AppConstants.EXTRA_SONG_ID, songId);
@@ -130,6 +131,7 @@ public class PlayerActivity extends AppCompatActivity {
     private void parseIntent() {
         Intent it = getIntent();
         if (it != null) {
+            // 不同入口只传歌曲 id，播放器内部再统一渲染音频、封面和歌词。
             songId = it.getIntExtra(EXTRA_SONG_ID, 1);
             playFromDownload = it.getBooleanExtra(EXTRA_PLAY_FROM_DOWNLOAD, false);
         }
@@ -141,11 +143,10 @@ public class PlayerActivity extends AppCompatActivity {
         tvProgress = findViewById(R.id.tv_progress);
         tvTotal = findViewById(R.id.tv_total);
 
-        // Lyric is placed below the first screen; use whole-page scroll instead of inner scroll.
+        // 歌词放在首屏下面，页面整体滚动，避免在 TextView 内部再嵌套滚动。
         tvLyric = findViewById(R.id.tv_lyric);
 
-        // Ensure "first screen" always fills at least one screen height,
-        // so lyric is not visible until the user scrolls down.
+        // 首屏至少撑满一个屏幕高度，这样打开播放器时先看到封面和控制区，向下滑才看歌词。
         View firstScreen = findViewById(R.id.cl_first_screen);
         if (firstScreen != null) {
             int screenH = getResources().getDisplayMetrics().heightPixels;
@@ -165,7 +166,7 @@ public class PlayerActivity extends AppCompatActivity {
 
     private void initData() {
         renderSong(songId);
-        // 初始图标
+        // 初始图标先显示播放，真正状态随后由 ticker 根据 MediaPlayer 同步。
         btnPlayPause.setImageResource(R.drawable.ic_player_play);
     }
 
@@ -180,7 +181,7 @@ public class PlayerActivity extends AppCompatActivity {
         btnPlayPause.setOnClickListener(v -> {
             if (!bound) return;
             playerService.togglePlayPause();
-            // UI 由 ticker 同步
+            // UI 由 ticker 同步，避免点击后图标和真实播放状态不一致。
         });
 
         btnNext.setOnClickListener(v -> {
@@ -201,11 +202,13 @@ public class PlayerActivity extends AppCompatActivity {
             Intent ds = new Intent(this, DownloadService.class);
             ds.setAction(AppConstants.ACTION_DOWNLOAD);
             ds.putExtra(AppConstants.EXTRA_SONG_ID, currentSong.getId());
+            // 下载交给 Service 做，页面只发起命令并提示用户，符合“后台任务不阻塞界面”的思路。
             startService(ds);
             toast("开始下载…");
         });
 
         btnCoverEffect.setOnClickListener(v -> {
+            // 每次点击在原图、旋转、灰度放大三种效果之间切换。
             coverEffectMode = nextCoverEffectMode(coverEffectMode);
             applyCoverEffect();
         });
@@ -226,6 +229,7 @@ public class PlayerActivity extends AppCompatActivity {
             public void onStopTrackingTouch(SeekBar seekBar) {
                 if (!bound) return;
                 int pos = seekBar.getProgress();
+                // 用户拖动进度条松手后，把毫秒位置交给 Service 中的 MediaPlayer seekTo。
                 playerService.seekTo(pos);
             }
         });
@@ -234,6 +238,7 @@ public class PlayerActivity extends AppCompatActivity {
     private void renderSong(int id) {
         List<Song> list = SongRepository.getPlayableSongList();
         Song found = null;
+        // 用 id 查找歌曲，保证从首页、专区、下载页进入播放器时都走同一套渲染逻辑。
         for (Song s : list) {
             if (s.getId() == id) {
                 found = s;
@@ -248,14 +253,16 @@ public class PlayerActivity extends AppCompatActivity {
         tvType.setText(currentSong.getType());
 
         if (ivCover != null) {
+            // 切歌时先恢复原图，避免上一首歌的灰度滤镜或旋转残留到下一首。
             ivCover.setImageResource(currentSong.getCoverResId());
             coverEffectMode = EFFECT_NORMAL;
             applyCoverEffect();
         }
 
+        // 歌词文件放在 assets 中，和音频一样从本地资源读取。
         tvLyric.setText(AssetUtil.readAssetText(this, currentSong.getAssetLyricPath()));
 
-        // 下载提示文案
+        // 根据本地文件是否存在切换按钮文案，用户能知道当前歌曲是否已保存到本地。
         btnDownload.setText(SongRepository.isDownloaded(this, currentSong)
                 ? "已下载（下载页可播放）"
                 : "下载到本地（下载页可播放）");
@@ -273,6 +280,7 @@ public class PlayerActivity extends AppCompatActivity {
 
     private void applyCoverEffect() {
         if (ivCover == null || btnCoverEffect == null) return;
+        // 每次应用新特效前先清空旧动画和滤镜，避免多种效果叠在一起难以讲清。
         ivCover.animate().cancel();
         ivCover.clearColorFilter();
         ivCover.setRotation(0f);
@@ -287,6 +295,7 @@ public class PlayerActivity extends AppCompatActivity {
                     .start();
         } else if (coverEffectMode == EFFECT_GRAY_SCALE) {
             btnCoverEffect.setText("封面特效：灰度放大");
+            // ColorMatrix 把饱和度设为 0，就是常见的“图片灰度化”处理。
             ColorMatrix matrix = new ColorMatrix();
             matrix.setSaturation(0f);
             ivCover.setColorFilter(new ColorMatrixColorFilter(matrix));
@@ -301,6 +310,7 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     private static void startForegroundServiceCompat(Context context, Intent intent) {
+        // Android 8 以后启动前台服务要用 startForegroundService，低版本继续用 startService。
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             context.startForegroundService(intent);
         } else {

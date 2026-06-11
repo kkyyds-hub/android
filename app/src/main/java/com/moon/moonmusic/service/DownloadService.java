@@ -18,8 +18,14 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * 下载服务：负责后台复制音频文件、本地保存和广播通知。
+ * 这里的下载不是访问网络，而是把 assets 中的音频和歌词复制到 App 专属目录，
+ * 这样下载页和播放器可以用同一套歌曲 id 读取本地文件。
+ */
 public class DownloadService extends Service {
 
+    // 单线程执行复制任务，避免多个下载同时写文件造成顺序混乱。
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     @Nullable
@@ -48,12 +54,14 @@ public class DownloadService extends Service {
             boolean ok = downloadSong(songId);
             if (ok) {
                 msg = "下载完成";
+                // 下载完成后发应用内广播，下载列表页面收到后刷新数据。
                 Intent bc = new Intent(AppConstants.ACTION_DOWNLOAD_DONE);
                 bc.setPackage(getPackageName());
                 bc.putExtra(AppConstants.EXTRA_SONG_ID, songId);
                 sendBroadcast(bc);
             } else {
                 msg = "下载失败";
+                // 失败也发广播，方便页面给出提示；这里没有直接操作 UI，因为 Service 没有界面。
                 Intent bc = new Intent(AppConstants.ACTION_DOWNLOAD_FAILED);
                 bc.setPackage(getPackageName());
                 bc.putExtra(AppConstants.EXTRA_SONG_ID, songId);
@@ -80,7 +88,7 @@ public class DownloadService extends Service {
         File dir = SongRepository.getDownloadDir(this);
         if (dir == null) return false;
 
-        // 目标文件名：song<ID>.mp3 / song<ID>.txt
+        // 目标文件名固定为 song<ID>.mp3 / song<ID>.txt，播放器就能按歌曲 id 直接查找。
         File mp3 = new File(dir, "song" + target.getId() + ".mp3");
         File lrc = new File(dir, "song" + target.getId() + ".txt");
 
@@ -97,6 +105,7 @@ public class DownloadService extends Service {
         if (assetPath == null || assetPath.isEmpty()) return;
         try (InputStream in = getAssets().open(assetPath);
              FileOutputStream out = new FileOutputStream(outFile)) {
+            // 用缓冲区一段一段复制，适合音频这种二进制文件，也不会一次占用太多内存。
             byte[] buf = new byte[8192];
             int len;
             while ((len = in.read(buf)) != -1) {

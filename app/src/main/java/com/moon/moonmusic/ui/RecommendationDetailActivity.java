@@ -12,6 +12,7 @@ import com.moon.moonmusic.R;
 
 /**
  * 艺人档案页：独立展示谢霆锋的基本信息、音乐经历、代表作品和主要成就。
+ * 页面底部嵌入本地 H5，用 WebView 加载 assets 网页资源。
  */
 public class RecommendationDetailActivity extends AppCompatActivity {
 
@@ -61,10 +62,13 @@ public class RecommendationDetailActivity extends AppCompatActivity {
     @SuppressLint("SetJavaScriptEnabled")
     private void initWebView() {
         WebSettings settings = webView.getSettings();
+        // 本项目加载 assets/h5 下的本地网页，不依赖外网也能显示图文资料。
         settings.setJavaScriptEnabled(true);
+        // 开启 DOM Storage，避免 H5 里使用 localStorage 等能力时被 WebView 默认限制。
         settings.setDomStorageEnabled(true);
         settings.setLoadWithOverviewMode(true);
         settings.setUseWideViewPort(true);
+        // 固定缩放比例，减少不同手机系统字体设置对 H5 排版的影响。
         settings.setTextZoom(100);
         webView.loadUrl(H5_ASSET_URL);
     }
@@ -72,6 +76,7 @@ public class RecommendationDetailActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         if (webView != null) {
+            // WebView 内部资源较重，页面销毁时主动释放，避免返回后继续占用内存。
             webView.destroy();
         }
         super.onDestroy();

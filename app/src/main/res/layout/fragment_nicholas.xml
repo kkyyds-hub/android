@@ -16,6 +16,7 @@
         android:layout_height="match_parent"
         android:background="#66000000" />
 
+    <!-- 谢霆锋专区主滚动页：集中展示网络推荐、定位歌单、WebView 详情入口和视频入口。 -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -32,6 +33,7 @@
             android:paddingEnd="16dp"
             android:paddingBottom="24dp">
 
+            <!-- 专区头部：展示人物信息，进入页面时会做简单入场动画。 -->
             <LinearLayout
                 android:id="@+id/ll_nicholas_hero"
                 android:layout_width="match_parent"
@@ -95,6 +97,7 @@
 
             </LinearLayout>
 
+            <!-- 今日推荐区：网络 HTTP 推荐和定位歌单都在这个卡片中更新。 -->
             <LinearLayout
                 android:id="@+id/ll_nicholas_score"
                 android:layout_width="match_parent"
@@ -276,6 +279,7 @@
 
             </LinearLayout>
 
+            <!-- 继续探索区：两个卡片分别跳转到 WebView 详情页和 VideoView 视频页。 -->
             <LinearLayout
                 android:id="@+id/ll_nicholas_explore"
                 android:layout_width="match_parent"
@@ -401,6 +405,7 @@
 
             </LinearLayout>
 
+            <!-- 专辑照片墙：横向滚动展示本地图片资源。 -->
             <LinearLayout
                 android:id="@+id/ll_nicholas_albums"
                 android:layout_width="match_parent"

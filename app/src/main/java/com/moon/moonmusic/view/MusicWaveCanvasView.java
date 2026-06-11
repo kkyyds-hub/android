@@ -10,6 +10,7 @@ import android.view.View;
 
 /**
  * 自定义绘图：用 Canvas / Paint 绘制谢霆锋推荐页的唱片与音浪图案。
+ * Canvas 负责“画在哪里”，Paint 负责“怎么画”，本 View 用 invalidate 形成简单动画。
  */
 public class MusicWaveCanvasView extends View {
 
@@ -25,6 +26,7 @@ public class MusicWaveCanvasView extends View {
         @Override
         public void run() {
             if (!animationEnabled) return;
+            // animationFrame 相当于动画帧编号；每次变化后 invalidate，会触发 onDraw 重新绘制。
             animationFrame = (animationFrame + 1) % 60;
             invalidate();
             postDelayed(this, 72);
@@ -47,6 +49,7 @@ public class MusicWaveCanvasView extends View {
     }
 
     private void init() {
+        // Paint 提前初始化，onDraw 时直接复用，避免绘制过程中频繁创建对象。
         discPaint.setColor(Color.rgb(24, 24, 30));
         discPaint.setStyle(Paint.Style.FILL);
 
@@ -69,6 +72,7 @@ public class MusicWaveCanvasView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        // 所有位置都按 View 当前宽高计算，布局尺寸变化时图形也能等比例适配。
         float width = getWidth();
         float height = getHeight();
         float centerX = width * 0.31f;
@@ -81,6 +85,7 @@ public class MusicWaveCanvasView extends View {
     }
 
     private void drawRecord(Canvas canvas, float centerX, float centerY, float radius) {
+        // 唱片主体：先画黑色圆，再画三圈白色圆环，体现 Canvas 基础图形绘制。
         canvas.drawCircle(centerX, centerY, radius, discPaint);
 
         for (int i = 1; i <= 3; i++) {
@@ -92,6 +97,7 @@ public class MusicWaveCanvasView extends View {
         centerPaint.setColor(Color.rgb(123, 75, 255));
         centerPaint.setStyle(Paint.Style.FILL);
         float centerPulse = calculateCenterPulse(animationFrame);
+        // 中心圆半径随帧数轻微变化，看起来像跟着音乐呼吸。
         canvas.drawCircle(centerX, centerY, radius * centerPulse, centerPaint);
 
         arcRect.set(centerX - radius, centerY - radius, centerX + radius, centerY + radius);
@@ -99,6 +105,7 @@ public class MusicWaveCanvasView extends View {
         arcPaint.setColor(Color.argb(230, 255, 255, 255));
         arcPaint.setStyle(Paint.Style.STROKE);
         arcPaint.setStrokeWidth(dp(4));
+        // drawArc 画出唱片上的高光弧线，起始角度随帧数变化形成旋转感。
         canvas.drawArc(arcRect, calculateArcStartAngle(animationFrame), 85, false, arcPaint);
     }
 
@@ -108,6 +115,7 @@ public class MusicWaveCanvasView extends View {
         float gap = dp(14);
         int[] heights = calculateAnimatedWaveHeights((int) height, animationFrame);
 
+        // 音浪由多条竖线组成，高度不断变化，体现 Paint 线条和动画刷新。
         for (int i = 0; i < heights.length; i++) {
             float x = startX + i * gap;
             float half = heights[i] / 2f;
@@ -131,6 +139,7 @@ public class MusicWaveCanvasView extends View {
 
     public static int[] calculateAnimatedWaveHeights(int viewHeight, int frame) {
         int safeHeight = Math.max(viewHeight, 120);
+        // 用简单数学公式生成节奏感，不依赖真实音频频谱，绘制逻辑更稳定。
         float beat = Math.abs((frame % 18) - 9) / 9f;
         float pulse = 0.16f + beat * 0.34f;
         float counterPulse = 0.16f + (1f - beat) * 0.28f;
@@ -155,9 +164,11 @@ public class MusicWaveCanvasView extends View {
     public void setAnimationEnabled(boolean enabled) {
         animationEnabled = enabled;
         if (enabled) {
+            // 开启动画时先移除旧任务，再重新 post，避免重复定时刷新。
             removeCallbacks(animator);
             post(animator);
         } else {
+            // 关闭时重置帧数并重绘一次，让音浪回到静止状态。
             removeCallbacks(animator);
             animationFrame = 0;
             invalidate();

@@ -6,6 +6,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
 
+/**
+ * SQLite 建库帮助类：第一次运行 App 时创建用户表。
+ * 登录注册相关的本地数据库表结构集中放在这里维护。
+ */
 public class UserDbHelper extends SQLiteOpenHelper {
 
     public static final String DB_NAME = "moon_music.db";
@@ -26,6 +30,7 @@ public class UserDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        // 用户表保存昵称、QQ、密码、性别和爱好；QQ 设置 UNIQUE 用来保证账号不重复。
         String sql = "CREATE TABLE IF NOT EXISTS " + TABLE_USER + " (" +
                 COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COL_NICKNAME + " TEXT NOT NULL, " +
@@ -40,6 +45,7 @@ public class UserDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // 当前数据库版本为 1，升级逻辑先采用简单重建表的写法。
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USER);
         onCreate(db);
     }

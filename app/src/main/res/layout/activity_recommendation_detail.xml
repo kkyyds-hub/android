@@ -17,6 +17,7 @@
         android:layout_height="match_parent"
         android:background="#70000000" />
 
+    <!-- 艺人档案页：上半部分是原生 Android 布局，下半部分嵌入 WebView 展示本地 H5。 -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -59,6 +60,7 @@
 
             </LinearLayout>
 
+            <!-- 原生信息卡片：用于展示艺人基本资料和代表作品。 -->
             <LinearLayout
                 android:id="@+id/ll_artist_hero"
                 android:layout_width="match_parent"
@@ -243,6 +245,7 @@
 
             </LinearLayout>
 
+            <!-- WebView 区域：RecommendationDetailActivity 会加载 assets/h5/nicholas_tse.html。 -->
             <LinearLayout
                 android:id="@+id/ll_artist_more_material"
                 android:layout_width="match_parent"

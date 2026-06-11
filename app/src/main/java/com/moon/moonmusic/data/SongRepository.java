@@ -9,9 +9,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 歌曲数据仓库：集中维护歌曲名称、封面资源、音频 assets 路径和歌词 assets 路径。
+ * 这样列表页、播放器、下载服务都从同一个地方取数据，减少多处维护同一份歌曲信息。
+ */
 public class SongRepository {
 
-    // 推荐下载（有音频文件，可播放）
+    // 推荐下载（有音频文件，可播放）。
     public static List<Song> getDownloadSongList() {
         List<Song> list = new ArrayList<>();
         list.add(new Song(
@@ -97,10 +101,10 @@ public class SongRepository {
         return list;
     }
 
-    // 喜欢列表（按文档 5 首命名；此处只做展示，不强制要求本地音频）
+    // 喜欢列表（按文档 5 首命名；此处只做展示，不强制要求本地音频）。
     public static List<Song> getFavoriteList() {
         List<Song> list = new ArrayList<>();
-        // 说明：喜欢列表只做 UI 展示（未强制提供音频文件）
+        // 说明：喜欢列表只做 UI 展示（未强制提供音频文件）。
         list.add(new Song(101, "蔷薇", "萧亚轩", "Elva", "喜欢",
                 R.drawable.cover_fav_elva, "", ""));
         list.add(new Song(102, "我只在乎你", "邓丽君", "我只在乎你", "喜欢",
@@ -113,7 +117,7 @@ public class SongRepository {
         return list;
     }
 
-    // 谢霆锋专区歌单：使用公开试听片段作为课程答辩演示音频。
+    // 谢霆锋专区歌单：使用公开试听片段作为可播放音频。
     public static List<Song> getNicholasSongList() {
         List<Song> list = new ArrayList<>();
         list.add(new Song(
@@ -171,13 +175,14 @@ public class SongRepository {
 
     public static List<Song> getPlayableSongList() {
         List<Song> list = new ArrayList<>();
+        // 播放器和下载服务只使用“可播放列表”，避免拿到没有音频路径的收藏展示数据。
         list.addAll(getDownloadSongList());
         list.addAll(getNicholasSongList());
         return list;
     }
 
     public static File getDownloadDir(Context context) {
-        // App 专属外部目录，无需存储权限
+        // App 专属外部目录，无需存储权限，卸载应用时这些下载文件也会被清理。
         File dir = context.getExternalFilesDir("moon_downloads");
         if (dir != null && !dir.exists()) {
             //noinspection ResultOfMethodCallIgnored
@@ -189,7 +194,7 @@ public class SongRepository {
     public static boolean isDownloaded(Context context, Song song) {
         File dir = getDownloadDir(context);
         if (dir == null) return false;
-        // 下载后保存为：song<ID>.mp3
+        // 下载后保存为：song<ID>.mp3，和 DownloadService 中的写入规则保持一致。
         File f = new File(dir, "song" + song.getId() + ".mp3");
         return f.exists();
     }
