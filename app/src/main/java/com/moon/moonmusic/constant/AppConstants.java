@@ -1,8 +1,7 @@
 package com.moon.moonmusic.constant;
 
 /**
- * 全局常量：集中保存跨组件使用的动作、传参键和通知通道。
- * 集中管理跨组件使用的动作、传参键和通知常量，避免字符串散落在各处。
+ * 集中管理跨组件使用的动作、传参键和通知常量。
  */
 public class AppConstants {
 

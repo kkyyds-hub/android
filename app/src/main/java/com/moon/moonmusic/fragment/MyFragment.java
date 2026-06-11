@@ -184,7 +184,7 @@ public class MyFragment extends Fragment {
         if (getContext() == null) return;
         // 清理登录态。
         SpUtil.clearLogin(requireContext());
-        // 退出时停止播放，避免“退出登录后还在播放”造成验收质疑。
+        // 退出时停止播放，避免退出登录后音乐仍在后台继续播放。
         try {
             requireContext().stopService(new Intent(requireContext(), PlayerService.class));
         } catch (Exception ignored) {

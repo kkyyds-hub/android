@@ -62,7 +62,7 @@ public class RecommendationDetailActivity extends AppCompatActivity {
     @SuppressLint("SetJavaScriptEnabled")
     private void initWebView() {
         WebSettings settings = webView.getSettings();
-        // 本项目加载 assets/h5 下的本地网页，不依赖外网也能显示图文资料。
+        // 这里加载 assets/h5 下的本地网页，不依赖外网也能显示图文资料。
         settings.setJavaScriptEnabled(true);
         // 开启 DOM Storage，避免 H5 里使用 localStorage 等能力时被 WebView 默认限制。
         settings.setDomStorageEnabled(true);

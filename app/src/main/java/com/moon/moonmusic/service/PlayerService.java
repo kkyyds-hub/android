@@ -222,7 +222,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
                 afd.close();
             }
 
-            // prepare 会读取音频元信息；本项目音频在本地，所以同步 prepare 足够直观。
+            // prepare 会读取音频元信息；音频来自本地资源，同步准备即可。
             mediaPlayer.prepare();
             if (autoPlay) {
                 mediaPlayer.start();
