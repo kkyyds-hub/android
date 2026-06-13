@@ -1,7 +1,12 @@
+# Gradle 版本目录：集中管理插件和依赖的版本号。
+# 子模块通过 version.ref 引用这里定义的版本，而不是硬编码数字。
+
 [versions]
-# Android Studio 2025.x compatible
+# AGP（Android Gradle Plugin）版本，与 Android Studio 2025.x 兼容
 agp = "8.13.2"
 
 [plugins]
+# com.android.application：用于构建 Android App 模块
 android-application = { id = "com.android.application", version.ref = "agp" }
+# com.android.library：用于构建 Android Library 模块（当前项目未使用，预留）
 android-library     = { id = "com.android.library",     version.ref = "agp" }

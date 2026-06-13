@@ -1,14 +1,21 @@
+<!--
+  styles.xml：自定义样式，供 Material 组件（如 ShapeableImageView）引用。
+  项目中的圆角头像、圆角封面等控件通过 app:shapeAppearanceOverlay 属性应用这些样式。
+-->
 <resources>
 
-    <!-- Shape overlays used by ShapeableImageView to avoid relying on platform/Material internal styles -->
+    <!-- 完全圆形（cornerSize=50%）：用于用户头像、播放器中间的封面 -->
     <style name="ShapeAppearanceOverlay.App.Corner.Full">
         <item name="cornerSize">50%</item>
     </style>
-
+    <!-- 大圆角 12dp：用于专辑封面、艺人照片 -->
     <style name="ShapeAppearanceOverlay.App.Corner.Medium">
         <item name="cornerSize">12dp</item>
     </style>
+    <!-- 普通圆角 8dp：默认圆角矩形 -->
     <style name="ShapeAppearanceOverlay.App.Corner" parent="">
         <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">8dp</item> </style>
+        <item name="cornerSize">8dp</item>
+    </style>
+
 </resources>

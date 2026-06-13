@@ -1,12 +1,20 @@
+<!--
+  bottom_nav_menu.xml：底部导航栏的菜单定义。
+  MainActivity 底部 BottomNavigationView 加载此菜单，点击不同 item 时
+  通过 id 判断切换到对应的 Fragment。
+-->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 首页：推荐下载列表，对应 HomeFragment -->
     <item
         android:id="@+id/nav_home"
         android:icon="@drawable/ic_nav_home"
         android:title="@string/nav_home"/>
+    <!-- 谢霆锋专区：线上推荐 + 定位歌单 + 视频 + 艺人档案入口，对应 NicholasFragment -->
     <item
         android:id="@+id/nav_nicholas"
         android:icon="@drawable/ic_nav_nicholas"
         android:title="@string/nav_nicholas"/>
+    <!-- 我的：用户信息 + 喜欢列表 + 下载列表，对应 MyFragment -->
     <item
         android:id="@+id/nav_my"
         android:icon="@drawable/ic_nav_my"

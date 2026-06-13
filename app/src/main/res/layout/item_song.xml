@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 歌曲列表项模板，被首页、下载页、喜欢页和谢霆锋专区共用。SongListAdapter 会把每首歌的封面、歌名和歌手·专辑信息填入对应控件。 -->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -7,6 +8,7 @@
     android:background="@drawable/bg_item_dark"
     android:padding="10dp">
 
+    <!-- 歌曲封面，56dp 圆角图片。SongListAdapter 通过 song.getCoverResId() 设置图片资源。 -->
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/iv_cover"
         android:layout_width="56dp"
@@ -18,6 +20,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
+    <!-- 歌名，超出一行时末尾省略号截断。 -->
     <TextView
         android:id="@+id/tv_title"
         android:layout_width="0dp"
@@ -33,6 +36,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/iv_cover"/>
 
+    <!-- 歌手 · 专辑副标题，由 Song.getSubtitle() 方法生成。 -->
     <TextView
         android:id="@+id/tv_subtitle"
         android:layout_width="0dp"

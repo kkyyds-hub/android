@@ -1,3 +1,4 @@
+<!-- 幽灵按钮背景：半透明白色填充 + 白色描边 + 22dp 圆角，用于深色背景上的次级按钮（如"我的下载"） -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
     <solid android:color="#66FFFFFF"/>
     <corners android:radius="22dp"/>

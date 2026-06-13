@@ -1,3 +1,4 @@
+<!-- 大号圆形毛玻璃背景：更深黑色半透明 + 稍粗白描边，用于播放器页面中间的"播放暂停"主按钮 -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
     <solid android:color="#7A000000"/>
     <stroke android:width="1.5dp" android:color="#44FFFFFF"/>

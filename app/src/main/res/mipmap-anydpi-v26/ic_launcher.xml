@@ -1,3 +1,8 @@
+<!--
+  自适应启动图标（Android 8.0+）。
+  由背景层（纯色深灰）和前景层（紫色圆形 + 白色 "M" 字母）组合而成。
+  系统会根据设备形状裁剪图标，例如圆形屏幕显示圆形，方形屏幕显示圆角方形。
+-->
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
     <background android:drawable="@drawable/ic_launcher_background"/>
     <foreground android:drawable="@drawable/ic_launcher_foreground"/>

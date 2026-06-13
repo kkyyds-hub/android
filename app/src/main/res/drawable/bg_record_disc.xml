@@ -1,13 +1,17 @@
+<!--
+  唱片盘背景：通过 layer-list 叠加三层椭圆形成黑胶唱片视觉效果。
+  用在 PlayerActivity 封面后面的圆形区域，封面图片居中叠在唱片上。
+-->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Soft outer disc -->
+    <!-- 第 1 层：最外圈，半透明深色椭圆打底 -->
     <item>
         <shape android:shape="oval">
             <solid android:color="#33000000"/>
         </shape>
     </item>
 
-    <!-- Outer ring -->
+    <!-- 第 2 层：内缩 4dp 的白色描边圆环，模拟唱片凹槽 -->
     <item android:left="4dp" android:top="4dp" android:right="4dp" android:bottom="4dp">
         <shape android:shape="oval">
             <stroke android:width="2dp" android:color="#44FFFFFF"/>
@@ -15,7 +19,7 @@
         </shape>
     </item>
 
-    <!-- Inner radial highlight -->
+    <!-- 第 3 层：中心径向渐变区域，从亮白渐变到透明，模拟唱片中心反光 -->
     <item android:left="14dp" android:top="14dp" android:right="14dp" android:bottom="14dp">
         <shape android:shape="oval">
             <gradient

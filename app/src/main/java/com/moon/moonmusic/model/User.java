@@ -1,12 +1,17 @@
 package com.moon.moonmusic.model;
 
+/**
+ * 用户数据模型，对应 SQLite 中的用户表。
+ * 注册时通过 UserDbHelper 写入数据库，登录后由 UserDao 查询并返回给 LoginActivity。
+ * 偏好（hobbies）字段以逗号分隔存储多个风格标签，如 "流行,摇滚,民谣"。
+ */
 public class User {
     private long id;
     private String nickname;
     private String qq;
     private String password;
     private String gender;
-    private String hobbies;
+    private String hobbies;  // 逗号分隔的风格偏好
 
     public User() {}
 

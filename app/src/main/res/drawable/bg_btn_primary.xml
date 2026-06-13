@@ -1,3 +1,4 @@
+<!-- 主按钮背景：紫色填充 + 22dp 圆角矩形，用于"注册并登录""我的喜欢"等主要操作按钮 -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
     <solid android:color="@color/moon_purple"/>
     <corners android:radius="22dp"/>

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 深色幽灵按钮：半透明黑底 + 细白色描边 + 12dp 圆角，用于卡片内的小号操作按钮（如"换一首推荐""定位歌单"） -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <solid android:color="#33000000" />
     <corners android:radius="12dp" />

@@ -1,3 +1,6 @@
+// 项目级构建文件：声明 Gradle 插件及其版本，供所有子模块使用
 plugins {
+    // Android Gradle Plugin 版本 8.13.2，apply false 表示只声明版本不在此处应用，
+    // 具体应用在 app/build.gradle 中
     id 'com.android.application' version '8.13.2' apply false
 }

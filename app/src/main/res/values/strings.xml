@@ -1,5 +1,11 @@
+<!--
+  strings.xml：集中管理应用内所有用户可见的字符串。
+  将文本从布局和代码中抽离到这里，方便统一修改和未来做多语言翻译（国际化）。
+-->
 <resources>
+    <!-- 应用名，显示在桌面图标下方和最近任务列表中 -->
     <string name="app_name">陶滴洋-陈灿煌-毛垲-许小志-陈胡滨-Moon Music</string>
+    <!-- 底部导航栏三个 Tab 的标签文字 -->
     <string name="nav_home">首页</string>
     <string name="nav_nicholas">谢霆锋</string>
     <string name="nav_my">我的</string>

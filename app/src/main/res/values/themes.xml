@@ -1,14 +1,37 @@
+<!--
+  themes.xml：全局主题配置，控制应用在所有页面上的默认视觉外观。
+  每个 Activity 创建时都会自动应用这里定义的主题属性。
+-->
 <resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+      应用唯一主题。
+      继承自 MaterialComponents.DayNight.NoActionBar：
+      - MaterialComponents：Google Material Design 组件风格
+      - DayNight：自动跟随系统深色模式切换日间/夜间配色
+      - NoActionBar：不显示系统顶部 ActionBar（项目使用自定义布局替代）
+    -->
     <style name="Theme.MoonMusic" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- 主色，影响 Toolbar、状态栏图标等 -->
         <item name="colorPrimary">@color/moon_purple</item>
+        <!-- 主色深色变体，状态栏底色等场景使用 -->
         <item name="colorPrimaryVariant">@color/moon_purple_dark</item>
+        <!-- 叠加在主色上的文字/图标颜色 -->
         <item name="colorOnPrimary">@color/moon_white</item>
+        <!-- 次要强调色，FAB、Switch 等组件使用 -->
         <item name="colorSecondary">@color/moon_purple</item>
+        <!-- 状态栏透明：让背景图延伸到状态栏下方，实现全屏沉浸感 -->
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <!-- 导航栏透明：底部虚拟按键区域也为透明 -->
         <item name="android:navigationBarColor">@android:color/transparent</item>
+        <!-- 允许内容绘制到状态栏后面（需要配合 fitsSystemWindows 或自行处理安全区） -->
         <item name="android:windowTranslucentStatus">true</item>
+        <!-- 允许内容绘制到导航栏后面 -->
         <item name="android:windowTranslucentNavigation">true</item>
+        <!-- 窗口默认背景色：黑色，保证页面加载前不会闪现白色 -->
         <item name="android:windowBackground">@android:color/black</item>
+        <!-- Android 10+ 允许 WebView 跟随系统深色模式自动反转颜色 -->
         <item name="android:forceDarkAllowed" tools:targetApi="q">true</item>
     </style>
+
 </resources>

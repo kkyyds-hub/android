@@ -1,36 +1,53 @@
+// 模块级构建配置：定义编译参数、构建特性和第三方依赖
 plugins {
-    id 'com.android.application'
+    id 'com.android.application'  // 声明这是一个 Android Application 模块（而非 Library）
 }
 
 android {
+    // 代码中所有 R 资源的包名，也是 Kotlin/Java 源文件的根包名
     namespace 'com.moon.moonmusic'
+    // 编译时使用的 Android SDK 版本（需本地安装对应 SDK）
     compileSdk 36
 
     defaultConfig {
+        // 应用唯一标识，设备上每个 App 的 applicationId 不能重复
         applicationId "com.moon.moonmusic"
+        // 最低支持的 Android 版本：API 24 = Android 7.0 Nougat
         minSdk 24
+        // 目标版本：API 36，表示 App 已经过此版本测试和适配
         targetSdk 36
+        // 内部版本号（整数），每次发版递增
         versionCode 1
+        // 对外显示的版本名称（字符串）
         versionName "1.0"
     }
 
     buildFeatures {
+        // 开启 ViewBinding，编译时自动生成布局绑定类（如 ActivityMainBinding），
+        // 代码中可以直接用 binding.xxx 访问控件，替代 findViewById
         viewBinding true
     }
 
     compileOptions {
-        // Use Java 17 bytecode for best AGP compatibility (works with JDK 21 toolchain)
+        // Java 17 兼容 AGP 8.x，JDK 21 工具链可向下编译 Java 17 字节码
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
 }
 
 dependencies {
+    // AndroidX 兼容库：提供 AppCompatActivity、AlertDialog 等向后兼容组件
     implementation 'androidx.appcompat:appcompat:1.7.0'
+    // Material Design 3 组件库：BottomNavigationView、ShapeableImageView、MaterialButton 等
     implementation 'com.google.android.material:material:1.12.0'
+    // ConstraintLayout：通过约束关系布局控件，避免多层嵌套的 LinearLayout/RelativeLayout
     implementation 'androidx.constraintlayout:constraintlayout:2.2.0'
+    // RecyclerView：高性能列表组件（预留给后续拓展使用）
     implementation 'androidx.recyclerview:recyclerview:1.4.0'
+    // AndroidX Fragment 库：Fragment 管理和 FragmentTransaction
     implementation 'androidx.fragment:fragment:1.8.5'
+    // JUnit 单元测试框架
     testImplementation 'junit:junit:4.13.2'
+    // JSON 解析库，测试用例中用于构造推荐数据的 mock 对象
     testImplementation 'org.json:json:20240303'
 }

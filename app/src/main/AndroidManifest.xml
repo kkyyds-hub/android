@@ -1,12 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  AndroidManifest.xml 是 Android 应用的清单文件，向系统声明应用包含哪些组件（Activity、Service、Receiver）
+  以及需要哪些系统权限。每个 Android 项目必须有且仅有一个此文件。
+-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- ===== 权限声明 ===== -->
+
+    <!-- 播放器前台服务所需基础权限，允许 Service 在通知栏显示播放控制 -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <!-- Android 14+ 要求单独声明前台服务的具体类型，此处声明为"媒体播放" -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <!-- 网络权限：谢霆锋专区的线上推荐功能需要请求 iTunes API -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- 粗略定位（基于基站/WiFi），谢霆锋专区根据城市生成歌单 -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- 精确定位（基于 GPS），权限请求时和粗略定位一起申请 -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- Android 13+ 必须在清单中声明通知权限，否则前台通知无法弹出 -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
@@ -18,26 +30,45 @@
         android:theme="@style/Theme.MoonMusic"
         tools:targetApi="36">
 
+        <!--
+          VideoActivity：谢霆锋专区"现场短片"入口，播放 assets 中的 Live 视频片段，
+          页面底部有自定义 MusicWaveCanvasView 音浪动画。
+        -->
         <activity
             android:name=".ui.VideoActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
 
+        <!--
+          RecommendationDetailActivity：艺人档案页，原生卡片 + 底部 WebView 加载本地 H5。
+        -->
         <activity
             android:name=".ui.RecommendationDetailActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
 
+        <!--
+          PlayerActivity：音乐播放器页面，从首页/专区/下载页跳转进入，
+          绑定 PlayerService 实现播放、暂停、切歌、进度跳转、封面特效和下载功能。
+        -->
         <activity
             android:name=".ui.PlayerActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
 
+        <!--
+          MainActivity：登录后的主页面，持有底部导航栏（首页/谢霆锋/我的）
+          和三个 Fragment 的切换容器。
+        -->
         <activity
             android:name=".ui.MainActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
 
+        <!--
+          LoginActivity：应用启动入口（LAUNCHER），提供"注册并登录"和"已有账号直接登录"两条路径，
+          注册信息写入 SQLite，登录状态保存到 SharedPreferences。
+        -->
         <activity
             android:name=".ui.LoginActivity"
             android:exported="true"
@@ -48,15 +79,28 @@
             </intent-filter>
         </activity>
 
+        <!--
+          PlayerService：前台服务，内部持有 MediaPlayer 实例，
+          负责音频播放、通知栏控制和 SeekBar 进度同步。
+          声明 foregroundServiceType="mediaPlayback" 以适配 Android 14+ 前台服务类型要求。
+        -->
         <service
             android:name=".service.PlayerService"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
 
+        <!--
+          DownloadService：后台下载服务，将 assets 中的 mp3 复制到 App 专属外部存储目录，
+          下载完成后发广播通知 DownloadFragment 刷新列表。
+        -->
         <service
             android:name=".service.DownloadService"
             android:exported="false" />
 
+        <!--
+          PlaybackActionReceiver：广播接收器，接收通知栏按钮（上一首/播放暂停/下一首/停止）
+          发出的广播，把 action 转发给 PlayerService 执行对应播放命令。
+        -->
         <receiver
             android:name=".receiver.PlaybackActionReceiver"
             android:exported="false" />

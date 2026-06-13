@@ -1,3 +1,4 @@
+<!-- 深色卡片背景：65% 不透明黑底 + 18dp 圆角，项目中最常用的卡片样式（登录表单、播放器信息区、词曲卡片等） -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
     <solid android:color="#66000000"/>
     <corners android:radius="18dp"/>

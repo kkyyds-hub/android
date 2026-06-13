@@ -1,8 +1,18 @@
+<!--
+  colors.xml：集中定义应用色板，所有颜色值在此维护。
+  布局和代码中通过 @color/xxx 引用，切换主题时只需改这里一处。
+-->
 <resources>
+    <!-- 主色：紫色，用于按钮填充、主题 colorPrimary、Launcher 图标前景 -->
     <color name="moon_purple">#7B4BFF</color>
+    <!-- 主色深色变体：用于 colorPrimaryVariant -->
     <color name="moon_purple_dark">#5E35FF</color>
+    <!-- 白色：按钮文字、卡片标题 -->
     <color name="moon_white">#FFFFFF</color>
+    <!-- 深黑色：页面背景 -->
     <color name="moon_black">#111111</color>
+    <!-- 半透明白色卡片背景：用于浅色卡片（#CC = 80% 不透明度） -->
     <color name="moon_card">#CCFFFFFF</color>
+    <!-- 半透明黑色卡片背景：用于深色毛玻璃卡片 -->
     <color name="moon_card_dark">#CC000000</color>
 </resources>

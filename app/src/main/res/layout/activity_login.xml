@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- 全屏背景图，覆盖状态栏和导航栏区域。 -->
     <ImageView
         android:id="@+id/iv_bg"
         android:layout_width="0dp"
@@ -16,6 +17,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- 顶部安全线：让登录表单从屏幕 35% 位置开始，保证靠上的页面布局适配不同屏幕高度。 -->
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/gl_top_safe"
         android:layout_width="wrap_content"

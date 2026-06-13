@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- 下载页布局：用 ListView 列出已下载到本地的歌曲，点击可直接播放。DownloadFragment 负责扫描下载目录并刷新列表。 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -13,6 +14,7 @@
         android:textColor="@android:color/white"
         android:textSize="16sp"/>
 
+    <!-- 下载列表，条目间距通过透明 divider 实现，避免系统默认分割线干扰深色背景。 -->
     <ListView
         android:id="@+id/lv_downloads"
         android:layout_width="match_parent"

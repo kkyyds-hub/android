@@ -1,3 +1,4 @@
+<!-- 小号圆形毛玻璃背景：黑色半透明 + 白描边，用于播放器页面两侧的"上一首""下一首"按钮 -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
     <solid android:color="#66000000"/>
     <stroke android:width="1dp" android:color="#33FFFFFF"/>

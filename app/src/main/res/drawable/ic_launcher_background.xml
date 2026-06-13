@@ -1,3 +1,4 @@
+<!-- 启动图标背景层：纯深灰色矩形，为前景层的紫色圆形提供对比底色 -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <solid android:color="#111111"/>
 </shape>

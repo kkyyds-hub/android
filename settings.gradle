@@ -1,16 +1,25 @@
+// 项目级 Gradle 设置：管理插件仓库、依赖仓库和模块结构
+
 pluginManagement {
+    // Gradle 插件的下载仓库
     repositories {
-        google()
-        mavenCentral()
-        gradlePluginPortal()
+        google()              // Android Gradle Plugin 等 Google 官方插件
+        mavenCentral()        // 开源库中央仓库
+        gradlePluginPortal()  // Gradle 官方插件门户
     }
 }
+
 dependencyResolutionManagement {
+    // FAIL_ON_PROJECT_REPOS：禁止子模块在自己的 build.gradle 里声明独立仓库，
+    // 所有依赖统一从这里配置的仓库下载，保证来源一致
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
     }
 }
+
+// Android Studio 中显示的项目名称
 rootProject.name = "MoonMusic"
+// 声明 app 目录是一个可构建的子模块
 include(":app")
